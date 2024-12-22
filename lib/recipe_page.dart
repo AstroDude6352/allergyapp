@@ -30,10 +30,10 @@ class _RecipePageState extends State<RecipePage> {
   @override
   void initState() {
     super.initState();
-    fetchCookieRecipes();
+    fetchCookieRecipe();
   }
 
-  void fetchCookieRecipes() async {
+  void fetchCookieRecipe() async {
     final schema = Schema.array(
       description: 'List of recipes with ingredients',
       items: Schema.object(properties: {
@@ -88,6 +88,7 @@ class _RecipePageState extends State<RecipePage> {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
