@@ -1,36 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:swipe_cards/swipe_cards.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import 'main.dart';
+
 class RecipeScreen extends StatefulWidget {
   final String diet;
   final List<String> allergens;
 
-  const RecipeScreen({Key? key, required this.diet, required this.allergens}) : super(key: key);
+  const RecipeScreen({Key? key, required this.diet, required this.allergens})
+      : super(key: key);
 
   @override
   _RecipeScreenState createState() => _RecipeScreenState();
 }
 
 class _RecipeScreenState extends State<RecipeScreen> {
-  List<String> recipeLinks = []; // Store the recipe links
-  bool isLoading = true; // Flag to show loading indicator
+  List<SwipeItem> swipeItems = [];
+  MatchEngine? matchEngine;
+  bool isLoading = true;
+  bool isFetching = false;
+  int fetchBatchSize = 30;
 
   @override
   void initState() {
     super.initState();
-    fetchRecipeLinks();
+    fetchAndPrepareRecipes(); // Initial fetch to load first batch of recipes
   }
 
-  void fetchRecipeLinks() async {
-    // Create allergen string from selected allergens
+  Future<bool> validateUrl(String url) async {
+    try {
+      final response = await http.head(Uri.parse(url));
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void fetchAndPrepareRecipes({bool isPrefetch = false}) async {
+    if (isFetching) return; // Avoid overlapping fetches
+
+    setState(() {
+      isFetching = true;
+    });
+
     String allergenString = widget.allergens.join(', ');
 
-    // Create the Gemini prompt dynamically based on the user's selected diet and allergens
-    final prompt =
-        'Find recipes that are suitable for the diet: ${widget.diet}, and do not contain any of the following allergens: $allergenString. Provide a list of recipe links.';
+    final prompt = '''
+Find $fetchBatchSize valid recipe URLs suitable for the diet: ${widget.diet}, excluding these allergens: $allergenString. 
+The URLs must lead to live, accessible recipe pages. Return them in a structured JSON array format like this: 
+[{"link": "https://example.com/recipe1"}, {"link": "https://example.com/recipe2"}].
+''';
 
     final schema = Schema.array(
       description: 'List of recipe links',
@@ -53,21 +76,42 @@ class _RecipeScreenState extends State<RecipeScreen> {
       final responseDisplay = response.text;
 
       if (responseDisplay != null) {
-        try {
-          final linksData = jsonDecode(responseDisplay) as List<dynamic>;
+        final rawLinks = (jsonDecode(responseDisplay) as List<dynamic>)
+            .map((linkData) => linkData['link'] as String)
+            .toList();
+
+        List<String> validLinks = [];
+        for (String link in rawLinks) {
+          if (await validateUrl(link)) {
+            validLinks.add(link);
+            if (validLinks.length >= fetchBatchSize) break;
+          }
+        }
+
+        if (validLinks.isNotEmpty) {
           setState(() {
-            // Extract the recipe links from the response
-            recipeLinks = linksData.map((linkData) => linkData['link'] as String).toList();
-            isLoading = false; // Set loading to false once links are loaded
+            swipeItems.addAll(validLinks.map((link) {
+              return SwipeItem(
+                content: link,
+                likeAction: () => print('Liked: $link'),
+                nopeAction: () => print('Disliked: $link'),
+              );
+            }));
+            matchEngine?.notifyListeners();
+            isLoading = false; // Mark as loaded only if initial load is done
           });
-        } catch (e) {
-          print('Error parsing response: $e');
+
+          // Prefetch the next batch immediately if needed
+          if (!isPrefetch) {
+            fetchAndPrepareRecipes(isPrefetch: true); // Fetch next batch in the background
+          }
         }
       }
     } catch (e) {
       print('Error fetching recipes: $e');
+    } finally {
       setState(() {
-        isLoading = false; // Set loading to false if there was an error
+        isFetching = false;
       });
     }
   }
@@ -80,30 +124,46 @@ class _RecipeScreenState extends State<RecipeScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: isLoading
-              ? const Center(child: CircularProgressIndicator()) // Show loading spinner while fetching
-              : recipeLinks.isEmpty
-              ? const Center(child: Text('No recipes found based on your preferences'))
-              : ListView.builder(
-            itemCount: recipeLinks.length,
-            itemBuilder: (context, index) {
-              final link = recipeLinks[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                child: ListTile(
-                  title: Text('Recipe ${index + 1}'),
-                  subtitle: Text(link),
-                  onTap: () {
-                    // Navigate to the WebView screen with the recipe link
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => WebViewScreen(url: link),
-                      ),
-                    );
-                  },
-                ),
-              );
+              ? const Center(child: CircularProgressIndicator())
+              : NotificationListener<ScrollNotification>(
+            onNotification: (scrollNotification) {
+              return false; // Don't trigger fetching during scrolls
             },
+            child: SwipeCards(
+              matchEngine: matchEngine ??= MatchEngine(swipeItems: swipeItems),
+              onStackFinished: () {
+                fetchAndPrepareRecipes(isPrefetch: true); // Fetch more recipes immediately when stack finishes
+              },
+              itemBuilder: (context, index) {
+                final link = swipeItems[index].content;
+                return Card(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Recipe ${index + 1}', style: const TextStyle(fontSize: 18)),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(link, textAlign: TextAlign.center),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => WebViewScreen(url: link),
+                            ),
+                          );
+                        },
+                        child: const Text('View Recipe'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              upSwipeAllowed: false,
+              leftSwipeAllowed: true,
+              rightSwipeAllowed: true,
+            ),
           ),
         ),
       ),
@@ -124,5 +184,3 @@ class WebViewScreen extends StatelessWidget {
     );
   }
 }
-
-
