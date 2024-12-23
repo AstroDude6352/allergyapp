@@ -1,5 +1,7 @@
+import 'package:allergy_app/recipe_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 const globalApiKey = 'AIzaSyCzPlrOqftEAJSIkNFjzyKUr3pGKWPKl5o';
 const List<String> dietList = [
@@ -59,7 +61,9 @@ const List<String> allergenList = [
 List<String> selectedAllergens = [];
 String? selectedDiet;
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
@@ -233,23 +237,15 @@ class _QuizScreenState extends State<QuizScreen> {
                       });
                     }
                   } else {
-                    // Final summary confirmation
                     print("Final Selected Diet: $selectedDiet");
                     print("Final Selected Allergens: $selectedAllergens");
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Thank You"),
-                        content: const Text("Your preferences have been saved."),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              // Optionally navigate to another screen or restart
-                            },
-                            child: const Text("OK"),
-                          ),
-                        ],
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RecipeScreen(
+                          diet: selectedDiet!,
+                          allergens: selectedAllergens,
+                        ),
                       ),
                     );
                   }
