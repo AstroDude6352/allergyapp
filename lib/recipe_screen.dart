@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -23,7 +24,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
   MatchEngine? matchEngine;
   bool isLoading = true;
   bool isFetching = false;
-  int fetchBatchSize = 30;
+  int fetchBatchSize = 10;
 
   @override
   void initState() {
@@ -40,6 +41,19 @@ class _RecipeScreenState extends State<RecipeScreen> {
     }
   }
 
+  Future<List<Map<String, String>>> validateRecipes(List<Map<String, String>> rawRecipes) async {
+    final validated = await Future.wait(rawRecipes.map((recipe) async {
+      final isLinkValid = await validateUrl(recipe['link']!);
+      final isImageValid = await validateUrl(recipe['image']!);
+
+      // Include recipe only if both link and image URLs are valid
+      return isLinkValid && isImageValid ? recipe : null;
+    }));
+
+    // Filter out null results
+    return validated.whereType<Map<String, String>>().toList();
+  }
+
   void fetchAndPrepareRecipes({bool isPrefetch = false}) async {
     if (isFetching) return; // Avoid overlapping fetches
 
@@ -50,16 +64,18 @@ class _RecipeScreenState extends State<RecipeScreen> {
     String allergenString = widget.allergens.join(', ');
 
     final prompt = '''
-Find $fetchBatchSize valid recipe URLs suitable for the diet: ${widget.diet}, excluding these allergens: $allergenString. 
-The URLs must lead to live, accessible recipe pages. Return them in a structured JSON array format like this: 
-[{"link": "https://example.com/recipe1"}, {"link": "https://example.com/recipe2"}].
+Find $fetchBatchSize valid recipes suitable for the diet: ${widget.diet}, excluding these allergens: $allergenString.
+Provide the following details for each recipe: name, image URL, and recipe URL. Return them in a structured JSON array format like this:
+[{"name": "Recipe 1", "image": "https://example.com/image1.jpg", "link": "https://example.com/recipe1"}].
 ''';
 
     final schema = Schema.array(
-      description: 'List of recipe links',
+      description: 'List of recipe details',
       items: Schema.object(properties: {
+        'name': Schema.string(description: 'Name of the recipe.', nullable: false),
+        'image': Schema.string(description: 'URL of the recipe image.', nullable: false),
         'link': Schema.string(description: 'URL of the recipe link.', nullable: false),
-      }, requiredProperties: ['link']),
+      }, requiredProperties: ['name', 'image', 'link']),
     );
 
     final model = GenerativeModel(
@@ -76,25 +92,23 @@ The URLs must lead to live, accessible recipe pages. Return them in a structured
       final responseDisplay = response.text;
 
       if (responseDisplay != null) {
-        final rawLinks = (jsonDecode(responseDisplay) as List<dynamic>)
-            .map((linkData) => linkData['link'] as String)
-            .toList();
+        final rawRecipes = (jsonDecode(responseDisplay) as List<dynamic>)
+            .map((recipeData) => {
+          'name': recipeData['name'] as String,
+          'image': recipeData['image'] as String,
+          'link': recipeData['link'] as String,
+        }).toList();
 
-        List<String> validLinks = [];
-        for (String link in rawLinks) {
-          if (await validateUrl(link)) {
-            validLinks.add(link);
-            if (validLinks.length >= fetchBatchSize) break;
-          }
-        }
+        // Validate recipes in parallel
+        final validRecipes = await validateRecipes(rawRecipes);
 
-        if (validLinks.isNotEmpty) {
+        if (validRecipes.isNotEmpty) {
           setState(() {
-            swipeItems.addAll(validLinks.map((link) {
+            swipeItems.addAll(validRecipes.map((recipe) {
               return SwipeItem(
-                content: link,
-                likeAction: () => print('Liked: $link'),
-                nopeAction: () => print('Disliked: $link'),
+                content: recipe,
+                likeAction: () => print('Liked: ${recipe['link']}'),
+                nopeAction: () => print('Disliked: ${recipe['link']}'),
               );
             }));
             matchEngine?.notifyListeners();
@@ -135,22 +149,30 @@ The URLs must lead to live, accessible recipe pages. Return them in a structured
                 fetchAndPrepareRecipes(isPrefetch: true); // Fetch more recipes immediately when stack finishes
               },
               itemBuilder: (context, index) {
-                final link = swipeItems[index].content;
+                final recipe = swipeItems[index].content as Map<String, String>;
                 return Card(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Recipe ${index + 1}', style: const TextStyle(fontSize: 18)),
+                      CachedNetworkImage(
+                        imageUrl: recipe['image']!,
+                        placeholder: (context, url) => CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(link, textAlign: TextAlign.center),
+                        child: Text(
+                          recipe['name']!,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => WebViewScreen(url: link),
+                              builder: (context) => WebViewScreen(url: recipe['link']!),
                             ),
                           );
                         },

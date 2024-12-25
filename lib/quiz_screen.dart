@@ -2,6 +2,8 @@ import 'package:allergy_app/recipe_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'home_screen.dart';
+
 const List<String> dietList = [
   'paleo',
   'keto',
@@ -224,9 +226,8 @@ class _QuizScreenState extends State<QuizScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RecipeScreen(
-                          diet: selectedDiet!,
-                          allergens: selectedAllergens,
+                        builder: (context) => HomeScreen(
+
                         ),
                       ),
                     );
