@@ -62,10 +62,11 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
+                  // Trigger the recipe fetching before navigating
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const RecipeScreen(
+                      builder: (context) => RecipeScreen(
                         diet: 'Any', // Replace with appropriate diet value
                         allergens: [], // Replace with actual allergens
                       ),

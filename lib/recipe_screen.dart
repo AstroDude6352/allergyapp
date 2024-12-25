@@ -22,14 +22,13 @@ class RecipeScreen extends StatefulWidget {
 class _RecipeScreenState extends State<RecipeScreen> {
   List<SwipeItem> swipeItems = [];
   MatchEngine? matchEngine;
-  bool isLoading = true;
   bool isFetching = false;
   int fetchBatchSize = 10;
 
   @override
   void initState() {
     super.initState();
-    fetchAndPrepareRecipes(); // Initial fetch to load first batch of recipes
+    fetchAndPrepareRecipes(); // Start fetching recipes in the background
   }
 
   Future<bool> validateUrl(String url) async {
@@ -46,16 +45,14 @@ class _RecipeScreenState extends State<RecipeScreen> {
       final isLinkValid = await validateUrl(recipe['link']!);
       final isImageValid = await validateUrl(recipe['image']!);
 
-      // Include recipe only if both link and image URLs are valid
       return isLinkValid && isImageValid ? recipe : null;
     }));
 
-    // Filter out null results
     return validated.whereType<Map<String, String>>().toList();
   }
 
-  void fetchAndPrepareRecipes({bool isPrefetch = false}) async {
-    if (isFetching) return; // Avoid overlapping fetches
+  void fetchAndPrepareRecipes() async {
+    if (isFetching) return;
 
     setState(() {
       isFetching = true;
@@ -99,7 +96,6 @@ Provide the following details for each recipe: name, image URL, and recipe URL. 
           'link': recipeData['link'] as String,
         }).toList();
 
-        // Validate recipes in parallel
         final validRecipes = await validateRecipes(rawRecipes);
 
         if (validRecipes.isNotEmpty) {
@@ -112,13 +108,10 @@ Provide the following details for each recipe: name, image URL, and recipe URL. 
               );
             }));
             matchEngine?.notifyListeners();
-            isLoading = false; // Mark as loaded only if initial load is done
           });
 
-          // Prefetch the next batch immediately if needed
-          if (!isPrefetch) {
-            fetchAndPrepareRecipes(isPrefetch: true); // Fetch next batch in the background
-          }
+          // Fetch next batch after 3 seconds in the background to avoid UI blockage
+          Future.delayed(Duration(seconds: 3), fetchAndPrepareRecipes);
         }
       }
     } catch (e) {
@@ -137,55 +130,50 @@ Provide the following details for each recipe: name, image URL, and recipe URL. 
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : NotificationListener<ScrollNotification>(
-            onNotification: (scrollNotification) {
-              return false; // Don't trigger fetching during scrolls
+          child: swipeItems.isEmpty
+              ? const Center(child: CircularProgressIndicator()) // Show loading if no recipes yet
+              : SwipeCards(
+            matchEngine: matchEngine ??= MatchEngine(swipeItems: swipeItems),
+            onStackFinished: () {
+              fetchAndPrepareRecipes(); // Fetch more recipes once the stack is finished
             },
-            child: SwipeCards(
-              matchEngine: matchEngine ??= MatchEngine(swipeItems: swipeItems),
-              onStackFinished: () {
-                fetchAndPrepareRecipes(isPrefetch: true); // Fetch more recipes immediately when stack finishes
-              },
-              itemBuilder: (context, index) {
-                final recipe = swipeItems[index].content as Map<String, String>;
-                return Card(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CachedNetworkImage(
-                        imageUrl: recipe['image']!,
-                        placeholder: (context, url) => CircularProgressIndicator(),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
+            itemBuilder: (context, index) {
+              final recipe = swipeItems[index].content as Map<String, String>;
+              return Card(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: recipe['image']!,
+                      placeholder: (context, url) => CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        recipe['name']!,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          recipe['name']!,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WebViewScreen(url: recipe['link']!),
-                            ),
-                          );
-                        },
-                        child: const Text('View Recipe'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              upSwipeAllowed: false,
-              leftSwipeAllowed: true,
-              rightSwipeAllowed: true,
-            ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => WebViewScreen(url: recipe['link']!),
+                          ),
+                        );
+                      },
+                      child: const Text('View Recipe'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            upSwipeAllowed: false,
+            leftSwipeAllowed: true,
+            rightSwipeAllowed: true,
           ),
         ),
       ),
