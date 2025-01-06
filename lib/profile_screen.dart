@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'home_screen.dart';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -280,7 +282,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: <Widget>[
             IconButton(
                 onPressed: () {
-                  // Navigate to Home Screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
                 },
                 icon: const Icon(Icons.home),
                 color: Colors.deepPurple),
@@ -298,7 +303,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.deepPurple),
             IconButton(
                 onPressed: () {
-                  // Navigate to Profile Screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
                 },
                 icon: const Icon(Icons.person),
                 color: Colors.deepPurple),

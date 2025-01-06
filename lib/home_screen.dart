@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../recipe_screen.dart';
 import '../profile_screen.dart';
+import 'explore_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -81,38 +82,42 @@ class HomeScreen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomAppBar(
         child: Row(
+          mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+          children: <Widget>[
             IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
-                );
-              },
-              icon: const Icon(Icons.home),
-              color: Colors.blue,
-            ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                },
+                icon: const Icon(Icons.home),
+                color: Colors.deepPurple),
             IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const RecipeScreen(diet: '', allergens: [],)),
-                );
-              },
-              icon: const Icon(Icons.bookmark),
-              color: Colors.blue,
-            ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ExploreScreen()),
+                  );
+                },
+                icon: const Icon(Icons.local_dining),
+                color: Colors.deepPurple),
             IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                );
-              },
-              icon: const Icon(Icons.person),
-              color: Colors.blue,
-            ),
+                onPressed: () {
+                  // Navigate to Dietary Preferences Screen
+                },
+                icon: const Icon(Icons.food_bank),
+                color: Colors.deepPurple),
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
+                },
+                icon: const Icon(Icons.person),
+                color: Colors.deepPurple),
           ],
         ),
       ),
