@@ -1,3 +1,4 @@
+import 'package:allergy_app/restaurant_screen.dart';
 import 'package:flutter/material.dart';
 import '../recipe_screen.dart';
 import '../profile_screen.dart';
@@ -105,7 +106,10 @@ class HomeScreen extends StatelessWidget {
                 color: Colors.deepPurple),
             IconButton(
                 onPressed: () {
-                  // Navigate to Dietary Preferences Screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RestaurantScreen()),
+                  );
                 },
                 icon: const Icon(Icons.food_bank),
                 color: Colors.deepPurple),
