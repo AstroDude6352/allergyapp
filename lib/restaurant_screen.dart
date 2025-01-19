@@ -1,6 +1,6 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:location/location.dart';
 
 class RestaurantScreen extends StatefulWidget {
   @override
@@ -8,44 +8,49 @@ class RestaurantScreen extends StatefulWidget {
 }
 
 class _RestaurantScreenState extends State<RestaurantScreen> {
-  List places = [];
-  bool isLoading = false;
+  late GoogleMapController mapController;
+  Location location = Location();
+  bool _serviceEnabled = false;
+  PermissionStatus? _permissionGranted;
+  LocationData? _locationData;
+
+  Set<Marker> _markers = {};
 
   @override
   void initState() {
     super.initState();
-    fetchPlaces();
+    initLocation();
   }
 
-  Future<void> fetchPlaces() async {
-    const String apiUrl = "https://api.foursquare.com/v3/places/search";
-    const String apiKey = "fsq3xu7eAswy6mt5RH42v+uV38fTVbYKutl+2V4NWlMsE4U="; // Replace with your API key
-
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final response = await http.get(
-        Uri.parse("$apiUrl?categories=13065&near=New York&limit=10"),
-        headers: {
-          "Authorization": apiKey,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          places = data['results'];
-        });
-      } else {
-        print("Error: ${response.statusCode} - ${response.body}");
+  initLocation() async {
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
       }
-    } catch (e) {
-      print("Error: $e");
-    } finally {
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _locationData = await location.getLocation();
+    if (_locationData != null) {
       setState(() {
-        isLoading = false;
+        _markers.add(Marker(
+          markerId: MarkerId('currentLocation'),
+          position: LatLng(_locationData!.latitude ?? 0, _locationData!.longitude ?? 0),
+          infoWindow: InfoWindow(title: 'You are here'),
+        ));
+
+        mapController.moveCamera(
+          CameraUpdate.newLatLng(LatLng(_locationData!.latitude ?? 0, _locationData!.longitude ?? 0)),
+        );
       });
     }
   }
@@ -54,33 +59,17 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Foursquare Places"),
-        backgroundColor: Colors.blueAccent,
+        title: Text('Nearby Restaurants'),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : places.isEmpty
-          ? const Center(
-        child: Text(
-          "No places found.",
-          style: TextStyle(fontSize: 18),
+      body: GoogleMap(
+        initialCameraPosition: CameraPosition(
+          target: LatLng(37.7749, -122.4194), // Default location (San Francisco)
+          zoom: 14.0,
         ),
-      )
-          : ListView.builder(
-        itemCount: places.length,
-        itemBuilder: (context, index) {
-          final place = places[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(
-                horizontal: 10, vertical: 5),
-            child: ListTile(
-              title: Text(place['name'] ?? 'Unknown'),
-              subtitle: Text(place['location']['formatted_address'] ??
-                  'Address not available'),
-              trailing: const Icon(Icons.restaurant),
-            ),
-          );
+        onMapCreated: (controller) {
+          mapController = controller;
         },
+        markers: _markers,
       ),
     );
   }
