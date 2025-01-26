@@ -160,9 +160,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onTap: _selectImage,
                       child: CircleAvatar(
                         radius: 65,
-                        backgroundImage: _imageFile != null
-                            ? FileImage(_imageFile!)
-                            : const AssetImage('assets/default_profile.jpg'),
                       ),
                     ),
                   ),

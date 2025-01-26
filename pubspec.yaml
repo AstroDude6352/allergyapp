@@ -52,6 +52,7 @@ dependencies:
   geolocator: ^13.0.2
   permission_handler: ^11.3.1
   carousel_slider: ^5.0.0
+  flutter_google_maps_webservices: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +75,11 @@ flutter:
     - family: Nunito
       fonts:
         - asset: fonts/Nunito/static/Nunito-Bold.ttf
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins/Poppins-Bold.ttf
+        - asset: fonts/Poppins/Poppins-Regular.ttf
+
 
 
   # The following line ensures that the Material Icons font is

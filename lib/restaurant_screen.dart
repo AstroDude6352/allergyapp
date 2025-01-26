@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_google_maps_webservices/places.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // Google Maps Flutter package
 import 'package:google_generative_ai/google_generative_ai.dart'; // Assuming you're using Gemini
 import 'dart:convert';
@@ -25,6 +26,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   GoogleMapController? mapController;
   Set<Marker> markers = Set(); // To store restaurant markers on the map
   Map<String, dynamic>? selectedRestaurant; // Store selected restaurant details
+  final places = GoogleMapsPlaces(apiKey: 'AIzaSyBKapRibYm4aGKiQcpoN2qXDgoHRr7ruzg');
 
   @override
   void initState() {
@@ -88,7 +90,6 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                 position: LatLng(restaurant['latitude'], restaurant['longitude']),
                 infoWindow: InfoWindow(
                   title: restaurant['name'],
-                  snippet: 'Tap to view more details',
                   onTap: () {
                     setState(() {
                       selectedRestaurant = restaurant;
@@ -106,7 +107,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'YourCustomFont', // Add your custom font
+                                  fontFamily: 'Poppins', // Add your custom font
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -115,7 +116,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey[600],
-                                  fontFamily: 'YourCustomFont', // Add your custom font
+                                  fontFamily: 'Nunito', // Add your custom font
                                 ),
                               ),
                             ],
@@ -138,49 +139,147 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     }
   }
 
+  Future<String?> getRestaurantImageUrl(String restaurantName) async {
+    try {
+      final response = await places.searchByText(restaurantName);
+      if (response.status == "OK" && response.results.isNotEmpty) {
+        final placeId = response.results[0].placeId;
+        final detailsResponse = await places.getDetailsByPlaceId(placeId);
+        if (detailsResponse.status == "OK" &&
+            detailsResponse.result.photos != null &&
+            detailsResponse.result.photos!.isNotEmpty) {
+          final photoReference = detailsResponse.result.photos![0].photoReference;
+          final photoUrl =
+              'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=$photoReference&key=AIzaSyBKapRibYm4aGKiQcpoN2qXDgoHRr7ruzg';
+          return photoUrl;
+        }
+      }
+    } catch (e) {
+      print('Error getting restaurant image: $e');
+    }
+    return null; // Return null if image URL couldn't be fetched
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Allergen-Free Restaurants')),
       body: latitude == null || longitude == null
           ? const Center(child: CircularProgressIndicator()) // Show loading while fetching data
-          : GoogleMap(
-        onMapCreated: (controller) {
-          mapController = controller;
-        },
-        initialCameraPosition: CameraPosition(
-          target: LatLng(latitude!, longitude!),
-          zoom: 12,
-        ),
-        markers: markers,
-      ),
-      // Drawer (side panel) for showing selected restaurant details
-      endDrawer: selectedRestaurant == null
-          ? null
-          : Drawer(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Restaurant: ${selectedRestaurant!['name']}',
-
-              ),
-              const SizedBox(height: 16),
-              Text('Latitude: ${selectedRestaurant!['latitude']}'),
-              Text('Longitude: ${selectedRestaurant!['longitude']}'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the drawer
+          : Stack(
+        children: [
+          // Google Map
+          GoogleMap(
+            onMapCreated: (controller) {
+              mapController = controller;
+            },
+            initialCameraPosition: CameraPosition(
+              target: LatLng(latitude!, longitude!),
+              zoom: 12,
+            ),
+            markers: markers.map((marker) {
+              return marker.copyWith(
+                onTapParam: () {
+                  setState(() {
+                    selectedRestaurant = restaurants.firstWhere(
+                            (restaurant) =>
+                        restaurant['name'] == marker.markerId.value);
+                  });
                 },
-                child: Text('Close'),
-              ),
-            ],
+              );
+            }).toSet(),
           ),
-        ),
+          // Details View Overlay
+          if (selectedRestaurant != null)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Card(
+                elevation: 8,
+                color: Colors.deepPurple[50],
+                margin: const EdgeInsets.all(5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Placeholder for restaurant image
+                      FutureBuilder<String?>(
+                        future: getRestaurantImageUrl(selectedRestaurant!['name']),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return const Icon(Icons.error);
+                          } else if (snapshot.hasData && snapshot.data != null) {
+                            return Container(
+                              height: 250,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                image: DecorationImage(
+                                  image: NetworkImage(snapshot.data!),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          } else {
+                            return const SizedBox(height: 150);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      // Restaurant name
+                      Text(
+                        selectedRestaurant!['name'],
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // More Details Button
+                      ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text(selectedRestaurant!['name']),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                        'Latitude: ${selectedRestaurant!['latitude']}'),
+                                    Text(
+                                        'Longitude: ${selectedRestaurant!['longitude']}'),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Close'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: const Text('More Details'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
+
 }
