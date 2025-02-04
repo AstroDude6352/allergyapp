@@ -1,4 +1,5 @@
 import 'package:allergy_app/restaurant_screen.dart';
+import 'package:allergy_app/scanner.dart';
 import 'package:flutter/material.dart';
 import '../recipe_screen.dart';
 import '../profile_screen.dart';
@@ -99,7 +100,7 @@ class HomeScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ExploreScreen()),
+                    MaterialPageRoute(builder: (context) => const ScannerScreen()),
                   );
                 },
                 icon: const Icon(Icons.local_dining),
