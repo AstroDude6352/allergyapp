@@ -107,14 +107,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(10),
             color: Colors.deepPurple[50],
           ),
-          child: Column(
+          child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Dietary Preferences',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               // Add widgets for dietary preferences (e.g., vegetarian, vegan, etc.)
             ],
           ),
@@ -131,8 +131,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Container(
           padding: const EdgeInsets.only(top: 15, bottom: 15),
           margin: const EdgeInsets.all(10.0),
-          child: Center(
-            child: const Text(
+          child: const Center(
+            child: Text(
               'Profile',
               style: TextStyle(
                 letterSpacing: 0.75,
@@ -147,129 +147,139 @@ class _ProfileScreenState extends State<ProfileScreen> {
         toolbarHeight: 50,
       ),
       body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: GestureDetector(
-                      onTap: _selectImage,
-                      child: CircleAvatar(
-                        radius: 65,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(top: 25, bottom: 25),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(userName, style: const TextStyle(
-                            fontFamily: "Montserrat",
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 10),
-                        Text(userEmail, style: const TextStyle(fontSize: 16)),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
-
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple[500],
-                            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 30),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'Edit Profile',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: GestureDetector(
+                          onTap: _selectImage,
+                          child: CircleAvatar(
+                            radius: 65,
+                            backgroundImage: _imageFile != null
+                                ? FileImage(_imageFile!)
+                                : null, // Show selected image
+                            child: _imageFile == null
+                                ? const Icon(Icons.person, size: 60)
+                                : null,
                           ),
                         ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Settings',
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Montserrat"),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 130,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: settings.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedSetting = settings[index];
-                          selectedSettingIndex = index;
-                        });
-                      },
-                      child: Container(
-                        width: 150,
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                            color: selectedSetting == settings[index]
-                                ? Colors.deepPurple[500]
-                                : Colors.deepPurple[50],
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                                color: Colors.transparent, width: 10)),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(top: 25, bottom: 25),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              settingIcons[index],
-                              size: 30,
-                              color: selectedSetting == settings[index]
-                                  ? Colors.white
-                                  : Colors.grey[850],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              settings[index],
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: selectedSetting == settings[index]
-                                      ? Colors.white
-                                      : null),
+                            Text(userName,
+                                style: const TextStyle(
+                                    fontFamily: "Montserrat",
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w700)),
+                            const SizedBox(height: 10),
+                            Text(userEmail,
+                                style: const TextStyle(fontSize: 16)),
+                            const SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepPurple[500],
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4, horizontal: 30),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                              ),
+                              child: const Text(
+                                'Edit Profile',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white),
+                              ),
                             ),
                           ],
                         ),
+                      )
+                    ],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Settings',
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Montserrat"),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 130,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: settings.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedSetting = settings[index];
+                              selectedSettingIndex = index;
+                            });
+                          },
+                          child: Container(
+                            width: 150,
+                            margin: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: selectedSetting == settings[index]
+                                  ? Colors.deepPurple[500]
+                                  : Colors.deepPurple[50],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  settingIcons[index],
+                                  size: 30,
+                                  color: selectedSetting == settings[index]
+                                      ? Colors.white
+                                      : Colors.grey[850],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  settings[index],
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: selectedSetting == settings[index]
+                                          ? Colors.white
+                                          : null),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  if (selectedSettingIndex != null) ...[
+                    const SizedBox(height: 20),
+                    _getSettingInfoWidget(selectedSettingIndex!),
+                  ],
+                ],
               ),
-              if (selectedSettingIndex != null) ...[
-                const SizedBox(height: 20),
-                _getSettingInfoWidget(selectedSettingIndex!),
-              ],
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -302,7 +312,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const ProfileScreen()),
                   );
                 },
                 icon: const Icon(Icons.person),
@@ -312,4 +323,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
 }
+

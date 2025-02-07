@@ -116,9 +116,11 @@ Future<Product?> getProduct(var barcode, BuildContext context) async {
   final ProductResultV3 result =
       await OpenFoodAPIClient.getProductV3(configuration);
 
+
   if (result.status == ProductResultV3.statusSuccess) {
     Navigator.push(
       context,
+
       MaterialPageRoute(
         builder: (context) => Ingredients(
           result.product?.imageFrontUrl,
@@ -127,10 +129,14 @@ Future<Product?> getProduct(var barcode, BuildContext context) async {
           result.product?.ingredients,
         ),
       ),
+
+
     );
 
     return result.product;
   } else {
     throw Exception('product not found for $barcode');
   }
+
+
 }
