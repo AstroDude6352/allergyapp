@@ -450,6 +450,35 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 65X7274DMG;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GTMSessionFetcher\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Google-Maps-iOS-Utils\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GoogleDataTransport\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GoogleToolboxForMac\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GoogleUtilities\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/PromisesObjC\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/geolocator_apple\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/google_maps_flutter_ios\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/image_picker_ios\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/location\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/mobile_scanner\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/nanopb\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/path_provider_foundation\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/permission_handler_apple\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/sqflite_darwin\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/url_launcher_ios\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/webview_flutter_wkwebview\"",
+					"\"${PODS_ROOT}/GoogleMaps/Base/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleMaps/Maps/Frameworks\"",
+					"\"${PODS_ROOT}/MLImage/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitBarcodeScanning/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitCommon/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitVision/Frameworks\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Base\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Maps\"",
+					"\"$(/Users/aditya/Documents/allergy_app)/Flutter\"",
+				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -632,6 +661,35 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 65X7274DMG;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GTMSessionFetcher\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Google-Maps-iOS-Utils\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GoogleDataTransport\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GoogleToolboxForMac\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GoogleUtilities\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/PromisesObjC\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/geolocator_apple\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/google_maps_flutter_ios\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/image_picker_ios\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/location\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/mobile_scanner\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/nanopb\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/path_provider_foundation\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/permission_handler_apple\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/sqflite_darwin\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/url_launcher_ios\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/webview_flutter_wkwebview\"",
+					"\"${PODS_ROOT}/GoogleMaps/Base/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleMaps/Maps/Frameworks\"",
+					"\"${PODS_ROOT}/MLImage/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitBarcodeScanning/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitCommon/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitVision/Frameworks\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Base\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Maps\"",
+					"\"$(/Users/aditya/Documents/allergy_app)/Flutter\"",
+				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -655,6 +713,35 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 65X7274DMG;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GTMSessionFetcher\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Google-Maps-iOS-Utils\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GoogleDataTransport\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GoogleToolboxForMac\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/GoogleUtilities\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/PromisesObjC\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/geolocator_apple\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/google_maps_flutter_ios\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/image_picker_ios\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/location\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/mobile_scanner\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/nanopb\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/path_provider_foundation\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/permission_handler_apple\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/sqflite_darwin\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/url_launcher_ios\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/webview_flutter_wkwebview\"",
+					"\"${PODS_ROOT}/GoogleMaps/Base/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleMaps/Maps/Frameworks\"",
+					"\"${PODS_ROOT}/MLImage/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitBarcodeScanning/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitCommon/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitVision/Frameworks\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Base\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Maps\"",
+					"\"$(/Users/aditya/Documents/allergy_app)/Flutter\"",
+				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

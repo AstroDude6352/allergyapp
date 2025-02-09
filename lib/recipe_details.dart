@@ -1,12 +1,10 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:swipe_cards/swipe_cards.dart';
 
-const String spoonacularApiKey = 'db9ded054e0d4745a6636108c3987351'; // Replace wit
+const String spoonacularApiKey = 'db9ded054e0d4745a6636108c3987351'; // Replace with your API key
 
 class RecipeDetailScreen extends StatelessWidget {
   final int recipeId;
@@ -15,21 +13,45 @@ class RecipeDetailScreen extends StatelessWidget {
 
   Future<Map<String, dynamic>> fetchRecipeDetails(int recipeId) async {
     final url = Uri.parse(
-        'https://api.spoonacular.com/recipes/$recipeId/information?apiKey=$spoonacularApiKey');
+        'https://api.spoonacular.com/recipes/$recipeId/information?includeNutrition=true&apiKey=$spoonacularApiKey');
+
 
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
+
+
+        final int calories = (data['nutrition']?['nutrients']?.firstWhere(
+              (nutrient) => nutrient['name'] == 'Calories',
+          orElse: () => {'amount': null},
+        )['amount'] as num?)?.toInt() ?? 0;
+
+        final int protein = (data['nutrition']?['nutrients']?.firstWhere(
+              (nutrient) => nutrient['name'] == 'Protein',
+          orElse: () => {'amount': null},
+        )['amount'] as num?)?.toInt() ?? 0;
+
+        final int fat = (data['nutrition']?['nutrients']?.firstWhere(
+              (nutrient) => nutrient['name'] == 'Fat',
+          orElse: () => {'amount': null},
+        )['amount'] as num?)?.toInt() ?? 0;
+
+
+        print('Extracted from API -> Calories: $calories, Protein: $protein g, Fat: $fat g');
+
+
+
+
         return {
           'name': data['title'] ?? 'Unknown Recipe',
           'image': data['image'] ?? '',
-          'rating': (data['spoonacularScore'] ?? 0) / 20.0, // Convert to 5-star scale
-          'description': data['summary'] != null
-              ? data['summary']
-              .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
-              : 'No description available.',
+          'rating': double.parse(((data['spoonacularScore'] ?? 0) / 20.0).toStringAsFixed(1)), // Round rating to 1 decimal
+
+          'calories': calories ?? 'N/A',
+          'protein': protein ?? 'N/A',
+          'fat': fat ?? 'N/A',
           'ingredients': data['extendedIngredients'] != null
               ? List<Map<String, dynamic>>.from(
               data['extendedIngredients'].map((ingredient) => {
@@ -38,12 +60,12 @@ class RecipeDetailScreen extends StatelessWidget {
                 'unit': ingredient['unit'] ?? '',
               }))
               : [],
-          'instructions': data['instructions'] != null
-              ? data['instructions']
-              .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
-              : 'No instructions available.',
-          'reviews': [], // Spoonacular API does not provide reviews; use placeholders or omit.
+          'instructions': data['analyzedInstructions'] != null && data['analyzedInstructions'].isNotEmpty
+              ? List<String>.from(
+              data['analyzedInstructions'][0]['steps'].map((step) => step['step'].toString()))
+              : ['No instructions available.'],
         };
+
       } else {
         throw Exception('Failed to fetch recipe details');
       }
@@ -103,10 +125,10 @@ class RecipeDetailScreen extends StatelessWidget {
 
                 // Recipe Details
                 DefaultTabController(
-                  length: 3,
+                  length: 2,
                   child: Column(
                     children: [
-                      // Title and Rating
+                      // Title, Rating, and Nutrition Info
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
@@ -140,11 +162,17 @@ class RecipeDetailScreen extends StatelessWidget {
                                 Text('${recipe['rating']} stars'),
                               ],
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              recipe['description'],
-                              style: const TextStyle(fontSize: 16),
+                            const SizedBox(height: 16),
+                            // Nutrition Info Circles
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _buildNutritionCircle('Calories', recipe['calories'].toString()),
+                                _buildNutritionCircle('Protein', '${recipe['protein'].toString()}g'),
+                                _buildNutritionCircle('Fat', '${recipe['fat'].toString()}g'),
+                              ],
                             ),
+                            const SizedBox(height: 16),
                           ],
                         ),
                       ),
@@ -154,7 +182,6 @@ class RecipeDetailScreen extends StatelessWidget {
                         tabs: [
                           Tab(text: 'Ingredients'),
                           Tab(text: 'Recipe'),
-                          Tab(text: 'Reviews'),
                         ],
                         indicatorColor: Colors.orange,
                         labelColor: Colors.orange,
@@ -163,7 +190,7 @@ class RecipeDetailScreen extends StatelessWidget {
 
                       // TabBarView
                       SizedBox(
-                        height: 400, // Set a height for the TabBarView
+                        height: 400, // Fixed height to prevent RenderBox error
                         child: TabBarView(
                           children: [
                             // Ingredients Tab
@@ -171,46 +198,47 @@ class RecipeDetailScreen extends StatelessWidget {
                               padding: const EdgeInsets.all(16.0),
                               children: recipe['ingredients']
                                   .map<Widget>(
-                                    (ingredient) => Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(ingredient['name']),
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.remove),
-                                          onPressed: () {
-                                            // Decrease quantity logic
-                                          },
-                                        ),
-                                        Text('${ingredient['quantity']}'),
-                                        Text(ingredient['unit']),
-                                        IconButton(
-                                          icon: const Icon(Icons.add),
-                                          onPressed: () {
-                                            // Increase quantity logic
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                    (ingredient) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(ingredient['name']),
+                                      Text(
+                                        '${ingredient['quantity']} ${ingredient['unit']}',
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               )
                                   .toList(),
                             ),
-                            // Instructions Tab
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                recipe['instructions'],
-                                style: const TextStyle(fontSize: 16),
+
+                            SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: recipe['instructions']
+                                      .map<Widget>(
+                                        (step) => Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${recipe['instructions'].indexOf(step) + 1}. ',
+                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          Expanded(child: Text(step)),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                      .toList(),
+                                ),
                               ),
-                            ),
-                            // Reviews Tab (Placeholder)
-                            const Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Text('No reviews available'),
                             ),
                           ],
                         ),
@@ -223,6 +251,28 @@ class RecipeDetailScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildNutritionCircle(String label, String value) {
+    return Column(
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.orange.shade100,
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(label, style: const TextStyle(fontSize: 14)),
+      ],
     );
   }
 }
