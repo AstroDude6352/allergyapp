@@ -1,8 +1,10 @@
 import 'package:allergy_app/restaurant_screen.dart';
 import 'package:allergy_app/scanner.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../recipe_screen.dart';
 import '../profile_screen.dart';
+import 'data_provider.dart';
 import 'explore_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -69,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => RecipeScreen(
+                      builder: (context) => const RecipeScreen(
                         diet: 'Any', // Replace with appropriate diet value
                         allergens: [], // Replace with actual allergens
                       ),

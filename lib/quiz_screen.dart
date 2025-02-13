@@ -1,62 +1,33 @@
 import 'package:allergy_app/recipe_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:allergy_app/data_provider.dart';
+
 
 import 'home_screen.dart';
 
 const List<String> dietList = [
-  'paleo',
-  'keto',
-  'low-carb',
-  'vegan',
-  'vegetarian',
-  'low-fat',
-  'atkins',
+  'Paleo',
+  'Keto',
+  'Vegan',
+  'Vegetarian',
+  'Low-Carb',
+  'Low-Fat',
 ];
 
 const List<String> allergenList = [
   'Milk',
   'Eggs',
   'Fish',
-  'Crustacean shellfish',
-  'Tree nuts',
+  'Crustacean Shellfish',
+  'Tree Nuts',
   'Peanuts',
   'Wheat',
   'Soybeans',
-  'Sesame seeds',
-  'Mustard',
-  'Celery',
-  'Lupin',
-  'Buckwheat',
-  'Corn',
-  'Poppy seeds',
-  'Chili peppers',
-  'Triticale',
-  'Fruits',
-  'Vegetables',
-  'Gelatin',
-  'Spices',
-  'Chocolate',
-  'Alcohol',
-  'Fennel',
-  'Coconut',
-  'Rice',
-  'Peas',
-  'Spinach',
-  'Asparagus',
-  'Quinoa',
-  'Tomato',
-  'Dairy products',
-  'Seaweed',
-  'Sulfites',
-  'Avocados',
-  'Mangoes',
-  'Honey',
-  'Wormwood',
-  'Cashews',
-  'Pistachios',
-  'Sunflower seeds',
+  'Sesame',
 ];
+
 
 List<String> selectedAllergens = [];
 String? selectedDiet;
@@ -232,14 +203,17 @@ class _QuizScreenState extends State<QuizScreen> {
                         });
                       }
                     } else {
-                      print("Final Selected Diet: $selectedDiet");
-                      print("Final Selected Allergens: $selectedAllergens");
+                      Provider.of<DataProvider>(context, listen: false).updateUserPreferences(
+                        selectedDiet,
+                        selectedAllergens,
+                      );
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => HomeScreen()),
                       );
                     }
                   },
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     padding: const EdgeInsets.symmetric(vertical: 15),
