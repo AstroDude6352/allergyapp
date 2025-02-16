@@ -1,6 +1,5 @@
+
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
-import 'package:allergy_app/ingredients.dart';
-import 'package:allergy_app/recipe_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -30,82 +29,84 @@ class ScannerScreen extends StatefulWidget {
 }
 
 class _ScannerScreenState extends State<ScannerScreen> {
-  String barcode = 'Tap to scan';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1D1E33),
       appBar: AppBar(
-        title: const Text(' Scanner'),
+        automaticallyImplyLeading: false,
+        backgroundColor: const Color(0xFF282A45),
+        elevation: 4,
+        title: const Text(
+          'Scan Your Food',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'Poppins',
+            color: Colors.tealAccent,
+          ),
+        ),
+        toolbarHeight: 100,
       ),
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ElevatedButton(
-              child: const Text('Scan Barcode'),
-              onPressed: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => AiBarcodeScanner(
-                      onDispose: () {
-                        /// This is called when the barcode scanner is disposed.
-                        /// You can write your own logic here.
-                        debugPrint("Barcode scanner disposed!");
-                      },
-                      hideGalleryButton: false,
-                      controller: MobileScannerController(
-                        detectionSpeed: DetectionSpeed.noDuplicates,
-                      ),
-                      onDetect: (BarcodeCapture capture) async {
-                        /// The row string scanned barcode value
-                        final String? scannedValue =
-                            capture.barcodes.first.rawValue;
-                        debugPrint("Barcode scanned: $scannedValue");
-
-                        getProduct(scannedValue, context);
-
-                        /// The `Uint8List` image is only available if `returnImage` is set to `true`.
-                        final Uint8List? image = capture.image;
-                        debugPrint("Barcode image: $image");
-
-                        /// row data of the barcode
-                        final Object? raw = capture.raw;
-                        debugPrint("Barcode raw: $raw");
-
-                        /// List of scanned barcodes if any
-                        final List<Barcode> barcodes = capture.barcodes;
-                        debugPrint("Barcode list: $barcodes");
-                      },
-                      validator: (value) {
-                        if (value.barcodes.isEmpty) {
-                          return false;
-                        }
-                        if (!(value.barcodes.first.rawValue
-                                ?.contains('flutter.dev') ??
-                            false)) {
-                          return false;
-                        }
-                        return true;
-                      },
-                    ),
+        child: Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.tealAccent,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 24,
                   ),
-                );
-              },
-            ),
-            Text(barcode),
-          ],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () async {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => AiBarcodeScanner(
+                        onDispose: () {
+                          debugPrint("Barcode scanner disposed!");
+                        },
+                        hideGalleryButton: false,
+                        controller: MobileScannerController(
+                          detectionSpeed: DetectionSpeed.noDuplicates,
+                        ),
+                        onDetect: (BarcodeCapture capture) async {
+                          final String? scannedValue = capture.barcodes.first.rawValue;
+                          debugPrint("Barcode scanned: $scannedValue");
+
+                          if (scannedValue != null) {
+                            getProduct(scannedValue, context);
+                          }
+                        },
+                        validator: (value) {
+                          return value.barcodes.isNotEmpty;
+                        },
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Scan Now',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-Future<Product?> getProduct(var barcode, BuildContext context) async {
-  OpenFoodAPIConfiguration.userAgent = UserAgent(
-    name: 'allergy_app',
-  );
- // barcode = '0048151623426';
+Future<void> getProduct(String barcode, BuildContext context) async {
+  OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'allergy_app');
 
   final ProductQueryConfiguration configuration = ProductQueryConfiguration(
     barcode,
@@ -113,30 +114,95 @@ Future<Product?> getProduct(var barcode, BuildContext context) async {
     fields: [ProductField.ALL],
     version: ProductQueryVersion.v3,
   );
-  final ProductResultV3 result =
-      await OpenFoodAPIClient.getProductV3(configuration);
-
+  final ProductResultV3 result = await OpenFoodAPIClient.getProductV3(configuration);
 
   if (result.status == ProductResultV3.statusSuccess) {
     Navigator.push(
       context,
-
       MaterialPageRoute(
-        builder: (context) => Ingredients(
-          result.product?.imageFrontUrl,
-          result.product?.productName,
-          result.product?.allergens?.names,
-          result.product?.ingredients,
+        builder: (context) => FoodDetailsScreen(
+          imageUrl: result.product?.imageFrontUrl,
+          productName: result.product?.productName ?? 'Unknown',
+          allergens: result.product?.allergens?.names ?? ['No allergens listed'],
+          ingredients: result.product?.ingredientsText ?? 'No ingredients available',
         ),
       ),
-
-
     );
-
-    return result.product;
   } else {
-    throw Exception('product not found for $barcode');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Product not found')),
+    );
   }
+}
 
+class FoodDetailsScreen extends StatelessWidget {
+  final String? imageUrl;
+  final String productName;
+  final List<String> allergens;
+  final String ingredients;
 
+  const FoodDetailsScreen({
+    super.key,
+    required this.imageUrl,
+    required this.productName,
+    required this.allergens,
+    required this.ingredients,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF1D1E33),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF282A45),
+        title: const Text(
+          'Food Details',
+          style: TextStyle(color: Colors.tealAccent),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (imageUrl != null)
+              Center(
+                child: Image.network(
+                  imageUrl!,
+                  height: 150,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            const SizedBox(height: 16),
+            Text(
+              productName,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Allergens:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent),
+            ),
+            Text(
+              allergens.join(', '),
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Ingredients:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.tealAccent),
+            ),
+            Text(
+              ingredients,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
