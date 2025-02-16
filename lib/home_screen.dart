@@ -7,6 +7,8 @@ import '../profile_screen.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+
+
   @override
   Widget build(BuildContext context) {
     String firstName = "Aditya"; // Placeholder name
