@@ -1,8 +1,13 @@
 import 'dart:convert';
+import 'package:allergy_app/profile_screen.dart';
 import 'package:allergy_app/recipe_details.dart';
+import 'package:allergy_app/restaurant_screen.dart';
+import 'package:allergy_app/scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+
+import 'home_screen.dart';
 
 class RecipeScreen extends StatefulWidget {
   final String diet;
@@ -27,7 +32,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Future<void> fetchRecipes() async {
     final allergenString = widget.allergens.join(',');
     final url = Uri.parse(
-        'https://api.spoonacular.com/recipes/complexSearch?diet=${widget.diet}&excludeIngredients=$allergenString&apiKey=db9ded054e0d4745a6636108c3987351');
+        'https://api.spoonacular.com/recipes/complexSearch?diet=${widget.diet}&apiKey=db9ded054e0d4745a6636108c3987351');
 
     try {
       final response = await http.get(url);
@@ -55,12 +60,12 @@ class _RecipeScreenState extends State<RecipeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF1D1E33),
       appBar: AppBar(
-        title: Text('Recipes'),
-        backgroundColor: Colors.white,
+        title: Text('Recipes', style: TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.w700),),
+        backgroundColor: Color(0xFF1D1E33),
         elevation: 0,
-        leading: Icon(Icons.menu, color: Colors.green),
-        actions: [Icon(Icons.shopping_cart, color: Colors.green)],
+        iconTheme: IconThemeData(color: Colors.white), // Makes the back arrow white
       ),
       body: isFetching
           ? Center(child: CircularProgressIndicator())
@@ -126,17 +131,31 @@ class _RecipeScreenState extends State<RecipeScreen> {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.green,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
+      bottomNavigationBar: BottomAppBar(
+        color: Color(0xFF282A45), // Dark footer for consistency
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              _buildNavBarItem(Icons.home, 'Home', Colors.tealAccent, context, const HomeScreen()),
+              _buildNavBarItem(Icons.local_dining, 'Scan', Colors.blueGrey, context, const ScannerScreen()),
+              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey, context, RestaurantScreen()),
+              _buildNavBarItem(Icons.person, 'Profile', Colors.blueGrey, context, const ProfileScreen()),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _buildNavBarItem(IconData icon, String label, Color color, BuildContext context, Widget screen) {
+    return IconButton(
+      onPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+      },
+      icon: Icon(icon, size: 28),
+      color: color,
     );
   }
 }

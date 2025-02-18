@@ -3,11 +3,12 @@ import 'package:allergy_app/scanner.dart';
 import 'package:flutter/material.dart';
 import '../recipe_screen.dart';
 import '../profile_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -67,16 +68,7 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Text(
-                'Saved Recipes',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 20),
-              const SizedBox(height: 40),
+
               const Text(
                 'Explore New Recipes',
                 style: TextStyle(
@@ -114,6 +106,8 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
+              const SizedBox(height: 40),
+              AllergyNewsSection(),
             ],
           ),
         ),
@@ -143,6 +137,85 @@ class HomeScreen extends StatelessWidget {
       },
       icon: Icon(icon, size: 28),
       color: color,
+    );
+  }
+}
+
+class AllergyNewsSection extends StatefulWidget {
+  @override
+  _AllergyNewsSectionState createState() => _AllergyNewsSectionState();
+}
+
+class _AllergyNewsSectionState extends State<AllergyNewsSection> {
+  final String apiKey = "6097e0789cb9402ab822540deb360dbc"; // Replace with your NewsAPI key
+  List articles = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchNews();
+  }
+
+  Future<void> fetchNews() async {
+    final String url =
+        "https://newsapi.org/v2/everything?q=food+allergy&language=en&sortBy=publishedAt&apiKey=$apiKey";
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          articles = data["articles"].take(5).toList(); // Limit to 5 articles
+        });
+      } else {
+        throw Exception("Failed to load news");
+      }
+    } catch (error) {
+      print("Error fetching news: $error");
+    }
+  }
+
+  void _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+        const Text(
+          'Allergy News & Alerts',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 10),
+        articles.isEmpty
+            ? const Center(child: CircularProgressIndicator(color: Colors.tealAccent))
+            : Column(
+          children: articles.map((article) {
+            return ListTile(
+              leading: const Icon(Icons.newspaper, color: Colors.tealAccent, size: 30), // News icon
+              title: Text(
+                article["title"],
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              trailing: const Icon(Icons.open_in_new, color: Colors.tealAccent), // Open link icon
+              onTap: () => _launchURL(article["url"]),
+            );
+
+          }).toList(),
+        ),
+      ],
     );
   }
 }

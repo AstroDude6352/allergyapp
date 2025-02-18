@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'package:allergy_app/restaurant_screen.dart';
+import 'package:allergy_app/scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:provider/provider.dart';
+import 'data_provider.dart';
 import 'home_screen.dart';
-import 'my_allergens_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,336 +15,150 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String? selectedSetting;
-  int? selectedSettingIndex;
-  File? _imageFile; // Variable to store the selected image file
-  String userName = "John Doe"; // Example user name
-  String userEmail = "example.com"; // Example user email
+  File? _imageFile;
+  String userName = "Aditya Y";
+  String userEmail = "example.com";
 
-  final List<String> settings = [
-    'Theme',
-    'Allergy Settings',
-    'Dietary Preferences',
-    // Add other settings as needed
-  ];
-
-  final List<IconData> settingIcons = [
-    Icons.color_lens,
-    Icons.local_dining,
-    Icons.food_bank,
-    // Add other icons for settings
-  ];
-
-  // Method to handle image selection
   Future<void> _selectImage() async {
-    final pickedFile =
-    await ImagePicker().pickImage(source: ImageSource.gallery);
-    setState(() {
-      _imageFile = File(pickedFile!.path);
-    });
-  }
-
-  Widget _getSettingInfoWidget(int index) {
-    switch (index) {
-      case 0:
-        return Container(
-          padding: const EdgeInsets.all(15),
-          margin: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.deepPurple[50],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Appearance',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              Switch(
-                value: false, // Replace with actual setting state
-                onChanged: (value) {
-                  // Add logic for toggling appearance setting
-                },
-              ),
-            ],
-          ),
-        );
-      case 1:
-        return Container(
-          padding: const EdgeInsets.all(15),
-          margin: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.deepPurple[50],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Allergy Settings',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Enable Allergy Alerts'),
-                  Switch(
-                    value: true, // Replace with actual setting state
-                    onChanged: (bool value) {
-                      // Add logic for toggling allergy alert setting
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      case 2:
-        return Container(
-          padding: const EdgeInsets.all(15),
-          margin: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.deepPurple[50],
-          ),
-          child: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Dietary Preferences',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              SizedBox(height: 10),
-              // Add widgets for dietary preferences (e.g., vegetarian, vegan, etc.)
-            ],
-          ),
-        );
-      default:
-        return const SizedBox.shrink();
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
     }
   }
 
+  final Map<String, IconData> allergenIcons = {
+    'Milk': Icons.local_drink,
+    'Eggs': Icons.egg,
+    'Fish': Icons.set_meal,
+    'Crustacean Shellfish': Icons.restaurant_menu,
+    'Tree Nuts': Icons.nature,
+    'Peanuts': Icons.spa,
+    'Wheat': Icons.grain,
+    'Soybeans': Icons.eco,
+    'Sesame': Icons.bakery_dining,
+  };
+
   @override
   Widget build(BuildContext context) {
+    final dataProvider = Provider.of<DataProvider>(context);
+
     return Scaffold(
+      backgroundColor: Color(0xFF1D1E33), // Consistent dark theme
       appBar: AppBar(
-        title: Container(
-          padding: const EdgeInsets.only(top: 15, bottom: 15),
-          margin: const EdgeInsets.all(10.0),
-          child: const Center(
-            child: Text(
-              'Profile',
-              style: TextStyle(
-                letterSpacing: 0.75,
-                fontSize: 26,
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.w700,
-              ),
+        backgroundColor: Color(0xFF282A45),
+
+        title: const Center(
+          child: Text(
+            'Profile',
+            style: TextStyle(
+              letterSpacing: 0.75,
+              fontSize: 26,
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.w700,
+              color: Colors.white
             ),
           ),
         ),
         automaticallyImplyLeading: false,
-        toolbarHeight: 50,
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  const SizedBox(width: 20),
+                  const Icon(
+                    Icons.medical_services,
+                    size: 60,
+                    color: Colors.tealAccent, // Allergy-related icon
+                  ),
+                  const SizedBox(width: 20),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: GestureDetector(
-                          onTap: _selectImage,
-                          child: CircleAvatar(
-                            radius: 65,
-                            backgroundImage: _imageFile != null
-                                ? FileImage(_imageFile!)
-                                : null, // Show selected image
-                            child: _imageFile == null
-                                ? const Icon(Icons.person, size: 60)
-                                : null,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(top: 25, bottom: 25),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(userName,
-                                style: const TextStyle(
-                                    fontFamily: "Montserrat",
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w700)),
-                            const SizedBox(height: 10),
-                            Text(userEmail,
-                                style: const TextStyle(fontSize: 16)),
-                            const SizedBox(height: 10),
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple[500],
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 4, horizontal: 30),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                              ),
-                              child: const Text(
-                                'Edit Profile',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
+
+                      Text(userName, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: 'Poppins')),
+
+                      Text(userEmail, style: const TextStyle(fontSize: 16, color: Colors.white, fontFamily: 'Nunito')),
                     ],
                   ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => MyAllergensScreen()),
-                              );
-                            },
-                            child: Text('My Allergies'),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Settings',
-                            style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: "Montserrat"),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 130,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: settings.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedSetting = settings[index];
-                              selectedSettingIndex = index;
-                            });
-                          },
-                          child: Container(
-                            width: 150,
-                            margin: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: selectedSetting == settings[index]
-                                  ? Colors.deepPurple[500]
-                                  : Colors.deepPurple[50],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  settingIcons[index],
-                                  size: 30,
-                                  color: selectedSetting == settings[index]
-                                      ? Colors.white
-                                      : Colors.grey[850],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  settings[index],
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: selectedSetting == settings[index]
-                                          ? Colors.white
-                                          : null),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  if (selectedSettingIndex != null) ...[
-                    const SizedBox(height: 20),
-                    _getSettingInfoWidget(selectedSettingIndex!),
-                  ],
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Row(
+                children: [
+
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Selected Diet:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Poppins')),
+                      const SizedBox(height: 4),
+                      Text(dataProvider.selectedDiet ?? 'No diet selected', style: const TextStyle(fontSize: 16, color: Colors.white, fontFamily: 'Nunito')),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Text('Allergens:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Poppins')),
+              const SizedBox(height: 8),
+              dataProvider.selectedAllergens.isNotEmpty
+                  ? Column(
+                children: dataProvider.selectedAllergens.map((allergen) {
+                  return Card(
+                    elevation: 2,
+                    color: Color(0xFF282A45),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
+                      leading: Icon(
+                        allergenIcons[allergen] ?? Icons.error,
+                        color: Colors.red,
+                      ),
+                      title: Text(
+                        allergen,
+                        style: const TextStyle(fontSize: 16, color: Colors.white, fontFamily: 'Nunito'),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              )
+                  : const Text('No allergens selected', style: TextStyle(fontSize: 16)),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  );
-                },
-                icon: const Icon(Icons.home),
-                color: Colors.deepPurple),
-            IconButton(
-                onPressed: () {
-                  // Navigate to Allergy Screen
-                },
-                icon: const Icon(Icons.local_dining),
-                color: Colors.deepPurple),
-            IconButton(
-                onPressed: () {
-                  // Navigate to Dietary Preferences Screen
-                },
-                icon: const Icon(Icons.food_bank),
-                color: Colors.deepPurple),
-            IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfileScreen()),
-                  );
-                },
-                icon: const Icon(Icons.person),
-                color: Colors.deepPurple),
-          ],
+        color: Color(0xFF282A45), // Dark footer for consistency
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              _buildNavBarItem(Icons.home, 'Home', Colors.blueGrey, context, const HomeScreen()),
+              _buildNavBarItem(Icons.local_dining, 'Scan', Colors.blueGrey, context, const ScannerScreen()),
+              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey, context, RestaurantScreen()),
+              _buildNavBarItem(Icons.person, 'Profile', Colors.tealAccent, context, const ProfileScreen()),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  Widget _buildNavBarItem(IconData icon, String label, Color color, BuildContext context, Widget screen) {
+    return IconButton(
+      onPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+      },
+      icon: Icon(icon, size: 28),
+      color: color,
+    );
+  }
 }
-
