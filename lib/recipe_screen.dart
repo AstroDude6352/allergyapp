@@ -30,23 +30,32 @@ class _RecipeScreenState extends State<RecipeScreen> {
   }
 
   Future<void> fetchRecipes() async {
-    final allergenString = widget.allergens.join(',');
     final url = Uri.parse(
-        'https://api.spoonacular.com/recipes/complexSearch?diet=${widget.diet}&apiKey=db9ded054e0d4745a6636108c3987351');
+        'https://api.spoonacular.com/recipes/complexSearch?diet=${widget.diet}&number=50&offset=50&apiKey=db9ded054e0d4745a6636108c3987351');
 
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        List<Map<String, dynamic>> allRecipes = List<Map<String, dynamic>>.from(
+          data['results'].map((recipe) => {
+            'name': recipe['title'] ?? 'Unknown Recipe',
+            'image': recipe['image'] ?? '',
+            'id': recipe['id'],
+          }),
+        );
+
+        List<Map<String, dynamic>> filteredRecipes = allRecipes.where((recipe) {
+          return true;
+        }).toList();
+
         setState(() {
-          recipes = List<Map<String, dynamic>>.from(
-              data['results'].map((recipe) => {
-                'name': recipe['title'] ?? 'Unknown Recipe',
-                'image': recipe['image'] ?? '',
-                'id': recipe['id'],
-              }));
+          recipes = filteredRecipes;
           isFetching = false;
         });
+
+        print("Total recipes found: ${allRecipes.length}");
+        print("Recipes that fit allergens: ${filteredRecipes.length}");
       } else {
         setState(() => isFetching = false);
         throw Exception('Failed to load recipes');
@@ -65,7 +74,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
         title: Text('Recipes', style: TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.w700),),
         backgroundColor: Color(0xFF1D1E33),
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white), // Makes the back arrow white
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: isFetching
           ? Center(child: CircularProgressIndicator())
@@ -104,7 +113,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                     Positioned(
                       bottom: 10,
                       left: 10,
-                      right: 10, // Ensures text stays within bounds
+                      right: 10,
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
@@ -132,7 +141,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Color(0xFF282A45), // Dark footer for consistency
+        color: Color(0xFF282A45),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
           child: Row(
@@ -159,4 +168,3 @@ class _RecipeScreenState extends State<RecipeScreen> {
     );
   }
 }
-

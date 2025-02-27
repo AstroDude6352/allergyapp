@@ -1,3 +1,4 @@
+import 'package:allergy_app/find_restaurant_info.dart';
 import 'package:allergy_app/restaurant_screen.dart';
 import 'package:allergy_app/scanner.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +122,7 @@ class HomeScreen extends StatelessWidget {
             children: <Widget>[
               _buildNavBarItem(Icons.home, 'Home', Colors.tealAccent, context, const HomeScreen()),
               _buildNavBarItem(Icons.local_dining, 'Scan', Colors.blueGrey, context, const ScannerScreen()),
-              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey, context, RestaurantScreen()),
+              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey, context, FindRestaurantInfo()),
               _buildNavBarItem(Icons.person, 'Profile', Colors.blueGrey, context, const ProfileScreen()),
             ],
           ),

@@ -5,7 +5,9 @@ import 'package:allergy_app/restaurant_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
+import 'package:provider/provider.dart';
 
+import 'data_provider.dart';
 import 'home_screen.dart';
 
 class ScannerScreen extends StatefulWidget {
@@ -146,13 +148,20 @@ class _ScannerScreenState extends State<ScannerScreen> {
       color: color,
     );
   }
-}Future<void> getProduct(String barcode, BuildContext context) async {
+}
+
+Future<void> getProduct(String barcode, BuildContext context) async {
   OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'allergy_app');
 
   final ProductQueryConfiguration configuration = ProductQueryConfiguration(
     barcode,
     language: OpenFoodFactsLanguage.ENGLISH,
-    fields: [ProductField.ALL],
+    fields: [
+      ProductField.ALL,
+      ProductField.ALLERGENS,
+      ProductField.ALLERGENS_TAGS_IN_LANGUAGES,
+      ProductField.INGREDIENTS,
+    ],
     version: ProductQueryVersion.v3,
   );
 
@@ -160,17 +169,64 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   if (result.status == ProductResultV3.statusSuccess && result.product != null) {
     final product = result.product;
-    final List<Ingredient>? ingredientList = product?.ingredients; // Keep it as List<Ingredient>?
 
-    // Navigate to the ingredient screen with actual ingredient objects
+    // Get user's allergens
+    final userAllergens = Provider.of<DataProvider>(context, listen: false).selectedAllergens;
+
+    // Extract allergens from OpenFoodFacts
+    List<String> productAllergens = [];
+    if (product?.allergensTagsInLanguages != null) {
+      productAllergens = product!.allergensTagsInLanguages!.values.expand((list) => list).toList();
+    }
+
+    if (productAllergens.isEmpty && product?.ingredients != null) {
+      debugPrint("No allergens found. Checking ingredients instead...");
+
+      productAllergens = product!.ingredients!
+          .map((ingredient) => ingredient.text)
+          .whereType<String>() // Remove null values
+          .toList();
+
+      debugPrint("Extracted Ingredients as Allergens: ${productAllergens.join(", ")}");
+    }
+
+// Debugging: Print all relevant data
+    debugPrint("User Allergens: ${userAllergens.join(", ")}");
+    debugPrint("Product Allergens: ${productAllergens.join(", ")}");
+
+// Check if the product is safe
+    bool isSafe = !productAllergens.any((allergen) => userAllergens.contains(allergen));
+
+
+
+
+    if (!isSafe) {
+      // Show an alert if the product contains allergens
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Warning: Allergen Detected!"),
+          content: Text("This product is NOT safe! It contains: ${productAllergens.join(", ")}"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+      return; // Stop navigation to the next screen
+    }
+
+    // Navigate to ingredient screen only if it's safe
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Ingredients(
           product?.imageFrontUrl ?? '',
           product?.productName ?? 'Unknown Product',
-          product?.allergens?.names ?? [],
-          ingredientList,  // Pass it directly as List<Ingredient>?
+          productAllergens, // Pass detected allergens
+          product?.ingredients, // Pass ingredient list
         ),
       ),
     );
@@ -191,3 +247,5 @@ class _ScannerScreenState extends State<ScannerScreen> {
     );
   }
 }
+
+

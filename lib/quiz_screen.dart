@@ -14,6 +14,8 @@ const List<String> dietList = [
   'Vegetarian',
   'Low-Carb',
   'Low-Fat',
+  'Other',
+  'None of these'
 ];
 
 const List<String> allergenList = [
@@ -26,7 +28,41 @@ const List<String> allergenList = [
   'Wheat',
   'Soybeans',
   'Sesame',
+  'Gluten',
+  'Corn',
+  'Mustard',
+  'Celery',
+  'Lupin',
+  'Sulfites',
+  'Mollusks',
+  'Legumes (other than peanuts/soybeans)',
+  'Coconut',
+  'Strawberries',
+  'Kiwi',
+  'Bananas',
+  'Avocado',
+  'Citrus Fruits',
+  'Tomatoes',
+  'Garlic',
+  'Onions',
+  'Bell Peppers',
+  'Eggplant',
+  'Mushrooms',
+  'Chia Seeds',
+  'Sunflower Seeds',
+  'Poppy Seeds',
+  'Fennel',
+  'Artificial Food Coloring',
+  'Preservatives',
+  // 'MSG (Monosodium Glutamate)',
+  'Gelatin',
+  'Yeast',
+  // 'Latex-Fruit Syndrome (e.g., banana, avocado, chestnut)',
+  'Alcohol',
+  'Other',
+  'None of these'
 ];
+
 
 
 List<String> selectedAllergens = [];
