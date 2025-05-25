@@ -40,7 +40,8 @@ class MyAllergensScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Selected Diet:',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 4),
                     Text(
@@ -59,29 +60,30 @@ class MyAllergensScreen extends StatelessWidget {
             SizedBox(height: 8),
             dataProvider.selectedAllergens.isNotEmpty
                 ? Column(
-              children: dataProvider.selectedAllergens.map((allergen) {
-                return Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    leading: Icon(
-                      allergenIcons[allergen] ?? Icons.error,
-                      color: Colors.red,
-                    ),
-                    title: Text(
-                      allergen,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                );
-              }).toList(),
-            )
+                    children: dataProvider.selectedAllergens.map((allergen) {
+                      return Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ListTile(
+                          leading: Icon(
+                            allergenIcons[allergen] ?? Icons.error,
+                            color: Colors.red,
+                          ),
+                          title: Text(
+                            allergen,
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  )
                 : Text(
-              'No allergens selected',
-              style: TextStyle(fontSize: 16),
-            ),
+                    'No allergens selected',
+                    style: TextStyle(fontSize: 16),
+                  ),
           ],
         ),
       ),
