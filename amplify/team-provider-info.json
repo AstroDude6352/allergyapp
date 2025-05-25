@@ -1,0 +1,33 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-allergyapp-dev-a2a2d-authRole",
+      "UnauthRoleArn": "arn:aws:iam::575721751194:role/amplify-allergyapp-dev-a2a2d-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::575721751194:role/amplify-allergyapp-dev-a2a2d-authRole",
+      "Region": "us-west-1",
+      "DeploymentBucketName": "amplify-allergyapp-dev-a2a2d-deployment",
+      "UnauthRoleName": "amplify-allergyapp-dev-a2a2d-unauthRole",
+      "StackName": "amplify-allergyapp-dev-a2a2d",
+      "StackId": "arn:aws:cloudformation:us-west-1:575721751194:stack/amplify-allergyapp-dev-a2a2d/b504c0a0-39a5-11f0-8d9a-0278b58da797",
+      "AmplifyAppId": "dge20c8lm4ife",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-allergyapp-dev-a2a2d-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "auth": {
+        "allergyappd807d704": {}
+      },
+      "function": {
+        "productAnalyzerFunction": {
+          "deploymentBucketName": "amplify-allergyapp-dev-a2a2d-deployment",
+          "s3Key": "amplify-builds/productAnalyzerFunction-45357772764539705947-build.zip"
+        }
+      },
+      "storage": {
+        "productImagesStorage": {}
+      },
+      "api": {
+        "productAnalyzerAPI": {}
+      }
+    }
+  }
+}

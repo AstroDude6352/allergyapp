@@ -1,0 +1,14 @@
+{
+  "resourceName": "productImagesStorage",
+  "policyUUID": "36eced1d",
+  "bucketName": "allergyapp3d09052eee244ce3b6f37c9c7dee8f6a",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}
