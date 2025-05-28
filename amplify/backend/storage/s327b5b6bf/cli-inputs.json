@@ -1,7 +1,7 @@
 {
-  "resourceName": "productImagesStorage",
-  "policyUUID": "36eced1d",
-  "bucketName": "allergyapp3d09052eee244ce3b6f37c9c7dee8f6a",
+  "resourceName": "s327b5b6bf",
+  "policyUUID": "27b5b6bf",
+  "bucketName": "allergyapp294ebac9fefc4b969f6611d650b44a59",
   "storageAccess": "auth",
   "guestAccess": [],
   "authAccess": [

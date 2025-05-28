@@ -1,15 +1,16 @@
 export type AmplifyDependentResourcesAttributes = {
   "api": {
-    "productAnalyzerAPI": {
+    "api121ee08e": {
       "ApiId": "string",
       "ApiName": "string",
       "RootUrl": "string"
     }
   },
   "auth": {
-    "allergyappd807d704": {
+    "allergyappc27c5ceb": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
+      "CreatedSNSRole": "string",
       "IdentityPoolId": "string",
       "IdentityPoolName": "string",
       "UserPoolArn": "string",
@@ -18,7 +19,7 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "function": {
-    "productAnalyzerFunction": {
+    "allergyappa00436fa": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",
@@ -27,7 +28,7 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "storage": {
-    "productImagesStorage": {
+    "s327b5b6bf": {
       "BucketName": "string",
       "Region": "string"
     }

@@ -1,32 +1,32 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-allergyapp-dev-a2a2d-authRole",
-      "UnauthRoleArn": "arn:aws:iam::575721751194:role/amplify-allergyapp-dev-a2a2d-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::575721751194:role/amplify-allergyapp-dev-a2a2d-authRole",
+      "AuthRoleName": "amplify-allergyapp-dev-ca60f-authRole",
+      "UnauthRoleArn": "arn:aws:iam::575721751194:role/amplify-allergyapp-dev-ca60f-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::575721751194:role/amplify-allergyapp-dev-ca60f-authRole",
       "Region": "us-west-1",
-      "DeploymentBucketName": "amplify-allergyapp-dev-a2a2d-deployment",
-      "UnauthRoleName": "amplify-allergyapp-dev-a2a2d-unauthRole",
-      "StackName": "amplify-allergyapp-dev-a2a2d",
-      "StackId": "arn:aws:cloudformation:us-west-1:575721751194:stack/amplify-allergyapp-dev-a2a2d/b504c0a0-39a5-11f0-8d9a-0278b58da797",
-      "AmplifyAppId": "dge20c8lm4ife",
-      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-allergyapp-dev-a2a2d-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+      "DeploymentBucketName": "amplify-allergyapp-dev-ca60f-deployment",
+      "UnauthRoleName": "amplify-allergyapp-dev-ca60f-unauthRole",
+      "StackName": "amplify-allergyapp-dev-ca60f",
+      "StackId": "arn:aws:cloudformation:us-west-1:575721751194:stack/amplify-allergyapp-dev-ca60f/8e9aefa0-3a3d-11f0-94f2-06cb9cba623b",
+      "AmplifyAppId": "d2hrn41qlztff2",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-allergyapp-dev-ca60f-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
       "auth": {
-        "allergyappd807d704": {}
+        "allergyappc27c5ceb": {}
       },
       "function": {
-        "productAnalyzerFunction": {
-          "deploymentBucketName": "amplify-allergyapp-dev-a2a2d-deployment",
-          "s3Key": "amplify-builds/productAnalyzerFunction-45357772764539705947-build.zip"
+        "allergyappa00436fa": {
+          "deploymentBucketName": "amplify-allergyapp-dev-ca60f-deployment",
+          "s3Key": "amplify-builds/allergyappa00436fa-717864494e6e73654379-build.zip"
         }
       },
       "storage": {
-        "productImagesStorage": {}
+        "s327b5b6bf": {}
       },
       "api": {
-        "productAnalyzerAPI": {}
+        "api121ee08e": {}
       }
     }
   }

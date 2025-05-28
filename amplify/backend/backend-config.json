@@ -1,6 +1,6 @@
 {
   "api": {
-    "productAnalyzerAPI": {
+    "api121ee08e": {
       "dependsOn": [
         {
           "attributes": [
@@ -8,7 +8,7 @@
             "Arn"
           ],
           "category": "function",
-          "resourceName": "productAnalyzerFunction"
+          "resourceName": "allergyappa00436fa"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -16,11 +16,11 @@
     }
   },
   "auth": {
-    "allergyappd807d704": {
+    "allergyappc27c5ceb": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
-        "mfaConfiguration": "OFF",
+        "mfaConfiguration": "OPTIONAL",
         "mfaTypes": [
           "SMS"
         ],
@@ -32,7 +32,9 @@
           "EMAIL"
         ],
         "socialProviders": [],
-        "usernameAttributes": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
         "verificationMechanisms": [
           "EMAIL"
         ]
@@ -42,32 +44,32 @@
     }
   },
   "function": {
-    "productAnalyzerFunction": {
+    "allergyappa00436fa": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
   },
   "parameters": {
-    "AMPLIFY_function_productAnalyzerFunction_deploymentBucketName": {
+    "AMPLIFY_function_allergyappa00436fa_deploymentBucketName": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "productAnalyzerFunction"
+          "resourceName": "allergyappa00436fa"
         }
       ]
     },
-    "AMPLIFY_function_productAnalyzerFunction_s3Key": {
+    "AMPLIFY_function_allergyappa00436fa_s3Key": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "productAnalyzerFunction"
+          "resourceName": "allergyappa00436fa"
         }
       ]
     }
   },
   "storage": {
-    "productImagesStorage": {
+    "s327b5b6bf": {
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "S3"

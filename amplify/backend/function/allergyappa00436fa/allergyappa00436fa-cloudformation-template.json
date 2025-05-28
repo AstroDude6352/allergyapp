@@ -47,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "productAnalyzerFunction",
+            "allergyappa00436fa",
             {
               "Fn::Join": [
                 "",
                 [
-                  "productAnalyzerFunction",
+                  "allergyappa00436fa",
                   "-",
                   {
                     "Ref": "env"
@@ -89,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "allergyappLambdaRole0293320d",
+            "allergyappLambdaRole33bff4fe",
             {
               "Fn::Join": [
                 "",
                 [
-                  "allergyappLambdaRole0293320d",
+                  "allergyappLambdaRole33bff4fe",
                   "-",
                   {
                     "Ref": "env"

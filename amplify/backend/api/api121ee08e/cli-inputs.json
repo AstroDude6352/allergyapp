@@ -1,12 +1,13 @@
 {
   "version": 1,
   "paths": {
-    "/products": {
-      "name": "/products",
-      "lambdaFunction": "productAnalyzerFunction",
+    "/detect": {
+      "name": "/detect",
+      "lambdaFunction": "allergyappa00436fa",
       "permissions": {
         "setting": "private",
         "auth": [
+          "create",
           "read"
         ]
       }

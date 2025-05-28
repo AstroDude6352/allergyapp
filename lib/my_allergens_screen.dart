@@ -44,10 +44,6 @@ class MyAllergensScreen extends StatelessWidget {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 4),
-                    Text(
-                      dataProvider.selectedDiet ?? 'No diet selected',
-                      style: TextStyle(fontSize: 16),
-                    ),
                   ],
                 ),
               ],
@@ -58,9 +54,9 @@ class MyAllergensScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            dataProvider.selectedAllergens.isNotEmpty
+            dataProvider.allergens.isNotEmpty
                 ? Column(
-                    children: dataProvider.selectedAllergens.map((allergen) {
+                    children: dataProvider.allergens.keys.map((allergen) {
                       return Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(

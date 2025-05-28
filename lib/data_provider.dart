@@ -1,15 +1,18 @@
 import 'package:flutter/foundation.dart';
 
 class DataProvider extends ChangeNotifier {
-  String? _selectedDiet;
-  List<String> _selectedAllergens = [];
+  String? _selectedTaste;
+  Map<String, String> _allergens = {}; // allergen name -> severity
 
-  String? get selectedDiet => _selectedDiet;
-  List<String> get selectedAllergens => _selectedAllergens;
+  String? get selectedTaste => _selectedTaste;
+  Map<String, String> get allergens => _allergens;
 
-  void updateUserPreferences(String? diet, List<String> allergens) {
-    _selectedDiet = diet;
-    _selectedAllergens = List.from(allergens);
+  void updateUserPreferences(
+    String? taste,
+    Map<String, String> allergens, // includes severity
+  ) {
+    _selectedTaste = taste;
+    _allergens = allergens;
     notifyListeners();
   }
 }

@@ -6,7 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_api/amplify_api.dart'; // Only if using REST or GraphQL
+import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'data_provider.dart';
 import 'quiz_screen.dart';
 
@@ -30,7 +32,11 @@ Future<void> main() async {
 Future<void> configureAmplify() async {
   try {
     if (!Amplify.isConfigured) {
-      await Amplify.addPlugin(AmplifyStorageS3());
+      await Amplify.addPlugins([
+        AmplifyAuthCognito(),
+        AmplifyAPI(), // only include if you added REST or GraphQL API
+        AmplifyStorageS3(),
+      ]);
       await Amplify.configure(amplifyconfig);
     }
   } catch (e) {

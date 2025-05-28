@@ -1,21 +1,18 @@
-import 'package:allergy_app/recipe_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:allergy_app/data_provider.dart';
-
-
 import 'home_screen.dart';
 
-const List<String> dietList = [
-  'Paleo',
-  'Keto',
-  'Vegan',
-  'Vegetarian',
-  'Low-Carb',
-  'Low-Fat',
-  'Other',
-  'None of these'
+const List<String> tastePreferences = [
+  'Spicy',
+  'Sweet',
+  'Savory',
+  'Salty',
+  'Sour',
+  'Bitter',
+  'Umami',
+  'Mild',
+  'No Preference',
 ];
 
 const List<String> allergenList = [
@@ -54,19 +51,14 @@ const List<String> allergenList = [
   'Fennel',
   'Artificial Food Coloring',
   'Preservatives',
-  // 'MSG (Monosodium Glutamate)',
   'Gelatin',
   'Yeast',
-  // 'Latex-Fruit Syndrome (e.g., banana, avocado, chestnut)',
   'Alcohol',
   'Other',
   'None of these'
 ];
 
-
-
-List<String> selectedAllergens = [];
-String? selectedDiet;
+const List<String> severityLevels = ['Mild', 'Moderate', 'Severe'];
 
 class QuizScreen extends StatefulWidget {
   @override
@@ -75,7 +67,8 @@ class QuizScreen extends StatefulWidget {
 
 class _QuizScreenState extends State<QuizScreen> {
   int currentQuestionIndex = 0;
-  String? selectedOption;
+  String? selectedTaste;
+  Map<String, String> allergenSeverities = {};
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +77,8 @@ class _QuizScreenState extends State<QuizScreen> {
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 30.0,
-            ),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -98,36 +89,28 @@ class _QuizScreenState extends State<QuizScreen> {
                     color: Colors.grey[700],
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Stack(
-                    children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Container(
-                            width:
-                                (constraints.maxWidth *
-                                    (currentQuestionIndex + 1) /
-                                    2), // Only 2 steps (Diet and Summary)
-                            decoration: BoxDecoration(
-                              color: Colors.pink,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Container(
+                        width: (constraints.maxWidth *
+                            (currentQuestionIndex + 1) /
+                            2),
+                        decoration: BoxDecoration(
+                          color: Colors.pink,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 30),
 
-                // Diet Question
                 if (currentQuestionIndex == 0) ...[
-                  const Text(
-                    "Question 1/2",
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
+                  const Text("Question 1/2",
+                      style: TextStyle(color: Colors.white70, fontSize: 16)),
                   const SizedBox(height: 10),
                   const Text(
-                    "What is your preferred diet?",
+                    "What are your taste preferences?",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -137,111 +120,140 @@ class _QuizScreenState extends State<QuizScreen> {
                   ),
                   const SizedBox(height: 30),
                   Column(
-                    children:
-                        dietList.map((diet) {
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedDiet = diet;
-                              });
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 15),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color:
-                                    selectedDiet == diet
-                                        ? Colors.blueAccent
-                                        : const Color(0xFF1D1E33),
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(
-                                  color: Colors.blueAccent,
-                                  width: 2,
+                    children: tastePreferences.map((taste) {
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedTaste = taste;
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 15),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: selectedTaste == taste
+                                ? Colors.blueAccent
+                                : const Color(0xFF1D1E33),
+                            borderRadius: BorderRadius.circular(25),
+                            border:
+                                Border.all(color: Colors.blueAccent, width: 2),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  taste,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "Nunito",
+                                      fontSize: 18),
                                 ),
                               ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      diet,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: "Nunito",
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ),
-                                  if (selectedDiet == diet)
-                                    const Icon(
-                                      Icons.check_circle,
-                                      color: Colors.white,
-                                    ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                              if (selectedTaste == taste)
+                                const Icon(Icons.check_circle,
+                                    color: Colors.white),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
-                ]
-                // Final Step: Review and update allergen list
-                else ...[
+                ] else ...[
                   const Text(
-                    "What are your allergens?",
+                    "Select your allergens and their severity:",
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children:
-                        allergenList.map((allergen) {
-                          final isSelected = selectedAllergens.contains(
-                            allergen,
-                          );
-                          return FilterChip(
-                            label: Text(allergen),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              setState(() {
-                                if (selected) {
-                                  selectedAllergens.add(allergen);
-                                } else {
-                                  selectedAllergens.remove(allergen);
-                                }
-                              });
-                            },
-                            selectedColor: Colors.blueAccent,
-                            backgroundColor: const Color(0xFF2E2F45),
-                            labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : Colors.white70,
-                              fontFamily: 'Nunito',
-                            ),
-                          );
-                        }).toList(),
+                  Column(
+                    children: allergenList.map((allergen) {
+                      bool isSelected =
+                          allergenSeverities.containsKey(allergen);
+                      return Card(
+                        color: const Color(0xFF2E2F45),
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  allergen,
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.white70,
+                                    fontFamily: 'Nunito',
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                              DropdownButton<String>(
+                                dropdownColor: const Color(0xFF2E2F45),
+                                value: allergenSeverities[allergen],
+                                hint: Text(
+                                  'Severity',
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                                iconEnabledColor: Colors.white,
+                                items: severityLevels.map((level) {
+                                  return DropdownMenuItem<String>(
+                                    value: level,
+                                    child: Text(level,
+                                        style: const TextStyle(
+                                            color: Colors.white)),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value != null) {
+                                      allergenSeverities[allergen] = value;
+                                    } else {
+                                      allergenSeverities.remove(allergen);
+                                    }
+                                  });
+                                },
+                              ),
+                              Checkbox(
+                                activeColor: Colors.blueAccent,
+                                value: isSelected,
+                                onChanged: (checked) {
+                                  setState(() {
+                                    if (checked == true) {
+                                      allergenSeverities[allergen] ??=
+                                          severityLevels[0];
+                                    } else {
+                                      allergenSeverities.remove(allergen);
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ],
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-                // Next Button
                 ElevatedButton(
                   onPressed: () {
                     if (currentQuestionIndex == 0) {
-                      if (selectedDiet != null) {
+                      if (selectedTaste != null) {
                         setState(() {
                           currentQuestionIndex++;
                         });
                       }
                     } else {
-                      Provider.of<DataProvider>(context, listen: false).updateUserPreferences(
-                        selectedDiet,
-                        selectedAllergens,
+                      Provider.of<DataProvider>(context, listen: false)
+                          .updateUserPreferences(
+                        selectedTaste,
+                        allergenSeverities,
                       );
                       Navigator.push(
                         context,
@@ -249,13 +261,11 @@ class _QuizScreenState extends State<QuizScreen> {
                       );
                     }
                   },
-
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                   child: Center(
                     child: Text(

@@ -56,10 +56,10 @@ dependencies:
   openfoodfacts: ^3.18.1
   firebase_core: ^3.11.0
   firebase_ml_model_downloader: ^0.3.3
-  cloud_firestore: ^5.6.3
   amplify_flutter: ^2.6.1
   amplify_storage_s3: ^2.6.1
   amplify_auth_cognito: ^2.6.1
+  amplify_api: ^2.6.1
 
 dev_dependencies:
   flutter_test:

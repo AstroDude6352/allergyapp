@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'package:allergy_app/RecipeFromImageScreen.dart';
 import 'package:allergy_app/restaurant_screen.dart';
-import 'package:allergy_app/scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +20,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String userEmail = "example.com";
 
   Future<void> _selectImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
@@ -48,17 +49,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: Color(0xFF1D1E33), // Consistent dark theme
       appBar: AppBar(
         backgroundColor: Color(0xFF282A45),
-
         title: const Center(
           child: Text(
             'Profile',
             style: TextStyle(
-              letterSpacing: 0.75,
-              fontSize: 26,
-              fontFamily: "Poppins",
-              fontWeight: FontWeight.w700,
-              color: Colors.white
-            ),
+                letterSpacing: 0.75,
+                fontSize: 26,
+                fontFamily: "Poppins",
+                fontWeight: FontWeight.w700,
+                color: Colors.white),
           ),
         ),
         automaticallyImplyLeading: false,
@@ -81,10 +80,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
-                      Text(userName, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: 'Poppins')),
-
-                      Text(userEmail, style: const TextStyle(fontSize: 16, color: Colors.white, fontFamily: 'Nunito')),
+                      Text(userName,
+                          style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              fontFamily: 'Poppins')),
+                      Text(userEmail,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                              fontFamily: 'Nunito')),
                     ],
                   ),
                 ],
@@ -92,44 +98,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 20),
               Row(
                 children: [
-
                   const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Selected Diet:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Poppins')),
+                      const Text('Selected Diet:',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontFamily: 'Poppins')),
                       const SizedBox(height: 4),
-                      Text(dataProvider.selectedDiet ?? 'No diet selected', style: const TextStyle(fontSize: 16, color: Colors.white, fontFamily: 'Nunito')),
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              const Text('Allergens:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Poppins')),
+              const Text('Allergens:',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: 'Poppins')),
               const SizedBox(height: 8),
-              dataProvider.selectedAllergens.isNotEmpty
+              dataProvider.allergens.isNotEmpty
                   ? Column(
-                children: dataProvider.selectedAllergens.map((allergen) {
-                  return Card(
-                    elevation: 2,
-                    color: Color(0xFF282A45),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ListTile(
-                      leading: Icon(
-                        allergenIcons[allergen] ?? Icons.error,
-                        color: Colors.red,
-                      ),
-                      title: Text(
-                        allergen,
-                        style: const TextStyle(fontSize: 16, color: Colors.white, fontFamily: 'Nunito'),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              )
-                  : const Text('No allergens selected', style: TextStyle(fontSize: 16)),
+                      children: dataProvider.allergens.keys.map((allergen) {
+                        return Card(
+                          elevation: 2,
+                          color: Color(0xFF282A45),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ListTile(
+                            leading: Icon(
+                              allergenIcons[allergen] ?? Icons.error,
+                              color: Colors.red,
+                            ),
+                            title: Text(
+                              allergen,
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                  fontFamily: 'Nunito'),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    )
+                  : const Text('No allergens selected',
+                      style: TextStyle(fontSize: 16)),
             ],
           ),
         ),
@@ -141,10 +159,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              _buildNavBarItem(Icons.home, 'Home', Colors.blueGrey, context, const HomeScreen()),
-              _buildNavBarItem(Icons.local_dining, 'Scan', Colors.blueGrey, context, const ScannerScreen()),
-              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey, context, RestaurantScreen()),
-              _buildNavBarItem(Icons.person, 'Profile', Colors.tealAccent, context, const ProfileScreen()),
+              _buildNavBarItem(Icons.home, 'Home', Colors.blueGrey, context,
+                  const HomeScreen()),
+              _buildNavBarItem(Icons.local_dining, 'Scan', Colors.blueGrey,
+                  context, const RecipeFromImageScreen()),
+              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey,
+                  context, RestaurantScreen()),
+              _buildNavBarItem(Icons.person, 'Profile', Colors.tealAccent,
+                  context, const ProfileScreen()),
             ],
           ),
         ),
@@ -152,10 +174,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildNavBarItem(IconData icon, String label, Color color, BuildContext context, Widget screen) {
+  Widget _buildNavBarItem(IconData icon, String label, Color color,
+      BuildContext context, Widget screen) {
     return IconButton(
       onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => screen));
       },
       icon: Icon(icon, size: 28),
       color: color,

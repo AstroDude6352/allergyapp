@@ -1,6 +1,8 @@
+import 'package:allergy_app/RecipeFromImageScreen.dart';
+import 'package:allergy_app/CrossContamScreen.dart';
+import 'package:allergy_app/ProductScannerScreen.dart';
 import 'package:allergy_app/find_restaurant_info.dart';
 import 'package:allergy_app/restaurant_screen.dart';
-import 'package:allergy_app/scanner.dart';
 import 'package:flutter/material.dart';
 import '../recipe_screen.dart';
 import '../profile_screen.dart';
@@ -69,7 +71,6 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-
               const Text(
                 'Explore New Recipes',
                 style: TextStyle(
@@ -120,10 +121,14 @@ class HomeScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              _buildNavBarItem(Icons.home, 'Home', Colors.tealAccent, context, const HomeScreen()),
-              _buildNavBarItem(Icons.local_dining, 'Scan', Colors.blueGrey, context, const ScannerScreen()),
-              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey, context, FindRestaurantInfo()),
-              _buildNavBarItem(Icons.person, 'Profile', Colors.blueGrey, context, const ProfileScreen()),
+              _buildNavBarItem(Icons.home, 'Home', Colors.tealAccent, context,
+                  const HomeScreen()),
+              _buildNavBarItem(Icons.local_dining, 'Scan', Colors.blueGrey,
+                  context, ProductScannerScreen()),
+              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey,
+                  context, RestaurantScreen()),
+              _buildNavBarItem(Icons.person, 'Profile', Colors.blueGrey,
+                  context, const ProfileScreen()),
             ],
           ),
         ),
@@ -131,10 +136,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNavBarItem(IconData icon, String label, Color color, BuildContext context, Widget screen) {
+  Widget _buildNavBarItem(IconData icon, String label, Color color,
+      BuildContext context, Widget screen) {
     return IconButton(
       onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => screen));
       },
       icon: Icon(icon, size: 28),
       color: color,
@@ -148,7 +155,8 @@ class AllergyNewsSection extends StatefulWidget {
 }
 
 class _AllergyNewsSectionState extends State<AllergyNewsSection> {
-  final String apiKey = "6097e0789cb9402ab822540deb360dbc"; // Replace with your NewsAPI key
+  final String apiKey =
+      "6097e0789cb9402ab822540deb360dbc"; // Replace with your NewsAPI key
   List articles = [];
 
   @override
@@ -201,21 +209,23 @@ class _AllergyNewsSectionState extends State<AllergyNewsSection> {
         ),
         const SizedBox(height: 10),
         articles.isEmpty
-            ? const Center(child: CircularProgressIndicator(color: Colors.tealAccent))
+            ? const Center(
+                child: CircularProgressIndicator(color: Colors.tealAccent))
             : Column(
-          children: articles.map((article) {
-            return ListTile(
-              leading: const Icon(Icons.newspaper, color: Colors.tealAccent, size: 30), // News icon
-              title: Text(
-                article["title"],
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                children: articles.map((article) {
+                  return ListTile(
+                    leading: const Icon(Icons.newspaper,
+                        color: Colors.tealAccent, size: 30), // News icon
+                    title: Text(
+                      article["title"],
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    trailing: const Icon(Icons.open_in_new,
+                        color: Colors.tealAccent), // Open link icon
+                    onTap: () => _launchURL(article["url"]),
+                  );
+                }).toList(),
               ),
-              trailing: const Icon(Icons.open_in_new, color: Colors.tealAccent), // Open link icon
-              onTap: () => _launchURL(article["url"]),
-            );
-
-          }).toList(),
-        ),
       ],
     );
   }

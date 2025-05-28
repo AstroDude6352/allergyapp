@@ -107,7 +107,8 @@ class _FindRestaurantInfoState extends State<FindRestaurantInfo> {
     }
   }
 
-  List<dynamic> getSafeMenuItems(List<dynamic> menuItems, List<String> userAllergens) {
+  List<dynamic> getSafeMenuItems(
+      List<dynamic> menuItems, List<String> userAllergens) {
     return menuItems.where((item) {
       List<String> allergens = List<String>.from(item["allergens"] ?? []);
       return !allergens.any((allergen) => userAllergens.contains(allergen));
@@ -115,13 +116,21 @@ class _FindRestaurantInfoState extends State<FindRestaurantInfo> {
   }
 
   Widget build(BuildContext context) {
-    List<String> userAllergens = Provider.of<DataProvider>(context).selectedAllergens;
+    final userAllergens = Provider.of<DataProvider>(context)
+        .allergens
+        .keys
+        .map((key) => key.toLowerCase())
+        .toList();
 
     return Scaffold(
       backgroundColor: Color(0xFF1D1E33),
       appBar: AppBar(
-        title: Text("Nearby Restaurants",
-          style: TextStyle(color: Colors.white, fontFamily: "Poppins", fontWeight: FontWeight.w700),
+        title: Text(
+          "Nearby Restaurants",
+          style: TextStyle(
+              color: Colors.white,
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.w700),
         ),
         backgroundColor: Color(0xFF282A45),
       ),
@@ -132,44 +141,52 @@ class _FindRestaurantInfoState extends State<FindRestaurantInfo> {
             padding: EdgeInsets.all(10),
             child: Text(
               "Here are your safe menu items at these restaurants",
-              style: TextStyle(color: Colors.white70, fontSize: 16, fontFamily: "Poppins"),
+              style: TextStyle(
+                  color: Colors.white70, fontSize: 16, fontFamily: "Poppins"),
             ),
           ),
           Expanded(
             child: restaurants.isEmpty
                 ? Center(child: CircularProgressIndicator())
                 : ListView.builder(
-              itemCount: restaurants.length,
-              itemBuilder: (context, index) {
-                var restaurant = restaurants[index];
-                var safeMenuItems = getSafeMenuItems(restaurant["menuItems"], userAllergens);
+                    itemCount: restaurants.length,
+                    itemBuilder: (context, index) {
+                      var restaurant = restaurants[index];
+                      var safeMenuItems = getSafeMenuItems(
+                          restaurant["menuItems"], userAllergens);
 
-                return Card(
-                  margin: EdgeInsets.all(10),
-                  color: Color(0xFF282A45),
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(restaurant["name"],
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                        Divider(color: Colors.grey),
-                        safeMenuItems.isEmpty
-                            ? Text("No safe menu items found.", style: TextStyle(color: Colors.white70))
-                            : Column(
-                          children: safeMenuItems
-                              .map((item) => ListTile(
-                            title: Text(item["title"], style: TextStyle(color: Colors.white)),
-                          ))
-                              .toList(),
+                      return Card(
+                        margin: EdgeInsets.all(10),
+                        color: Color(0xFF282A45),
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(restaurant["name"],
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white)),
+                              Divider(color: Colors.grey),
+                              safeMenuItems.isEmpty
+                                  ? Text("No safe menu items found.",
+                                      style: TextStyle(color: Colors.white70))
+                                  : Column(
+                                      children: safeMenuItems
+                                          .map((item) => ListTile(
+                                                title: Text(item["title"],
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
+                                              ))
+                                          .toList(),
+                                    ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),

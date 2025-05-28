@@ -1,21 +1,20 @@
 import 'dart:convert';
 
-import 'package:allergy_app/quiz_screen.dart' as dataProvider;
+import 'package:allergy_app/data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_maps_webservices/places.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http; // Google Maps Flutter package
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart'; // Google Maps Flutter package
 
-
-final List<String> allergenList = dataProvider.selectedAllergens;
+final allergenList =
+    DataProvider().allergens.keys.map((key) => key.toLowerCase()).toList();
 
 String allergenString = allergenList.isNotEmpty
     ? allergenList.join(', ')
     : 'No allergens specified';
 
-
 String userPreferences = 'Avoids: $allergenString';
-
 
 class RestaurantScreen extends StatefulWidget {
   @override
@@ -77,12 +76,13 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
 
       for (var place in response.results) {
         List<dynamic> menuItems = await fetchMenuItems(place.name);
-        bool hasSafeOptions = allergenList.isEmpty || menuItems.any((item) {
-          String menuDetails = (item['title'] ?? '').toString().toLowerCase();
-          return !allergenList.any((allergen) =>
-              menuDetails.contains(allergen.toLowerCase()));
-        });
-
+        bool hasSafeOptions = allergenList.isEmpty ||
+            menuItems.any((item) {
+              String menuDetails =
+                  (item['title'] ?? '').toString().toLowerCase();
+              return !allergenList.any(
+                  (allergen) => menuDetails.contains(allergen.toLowerCase()));
+            });
 
         updatedRestaurants.add({
           'name': place.name,
@@ -96,16 +96,18 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
       }
 
       // Count restaurants where menu items were successfully fetched
-      int restaurantsWithMenus = updatedRestaurants.where((r) => r['hasSafeOptions'] != null).length;
+      int restaurantsWithMenus =
+          updatedRestaurants.where((r) => r['hasSafeOptions'] != null).length;
       int totalRestaurants = updatedRestaurants.length;
 
-      print("Menu items found for $restaurantsWithMenus out of $totalRestaurants restaurants.");
+      print(
+          "Menu items found for $restaurantsWithMenus out of $totalRestaurants restaurants.");
       if (restaurantsWithMenus == 0) {
         print("No menu items found for any restaurant.");
       }
 
-      print("Restaurants found: ${updatedRestaurants.map((r) => r['name']).toList()}");
-
+      print(
+          "Restaurants found: ${updatedRestaurants.map((r) => r['name']).toList()}");
 
       setState(() {
         restaurants = updatedRestaurants;
@@ -114,7 +116,9 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
             markerId: MarkerId(restaurant['name']),
             position: LatLng(restaurant['latitude'], restaurant['longitude']),
             icon: BitmapDescriptor.defaultMarkerWithHue(
-              restaurant['hasSafeOptions'] ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueRed,
+              restaurant['hasSafeOptions']
+                  ? BitmapDescriptor.hueGreen
+                  : BitmapDescriptor.hueRed,
             ),
             infoWindow: InfoWindow(
               title: restaurant['name'],
@@ -132,20 +136,17 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     }
   }
 
-
-
-
   Future<bool> checkForAllergens(String restaurantName) async {
     final menuItems = await fetchMenuItems(restaurantName);
     for (var item in menuItems) {
       String menuDetails = item['title'].toLowerCase();
-      if (allergenList.any((allergen) => menuDetails.contains(allergen.toLowerCase()))) {
+      if (allergenList
+          .any((allergen) => menuDetails.contains(allergen.toLowerCase()))) {
         return true; // Contains allergens
       }
     }
     return false; // No allergens found
   }
-
 
   Future<List<dynamic>> fetchMenuItems(String restaurantName) async {
     final apiKey = 'db9ded054e0d4745a6636108c3987351';
@@ -157,7 +158,8 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
       List<dynamic> menuItems = data['menuItems'] ?? [];
 
       // Debug: Print fetched menu items
-      print("Fetched menu items for $restaurantName: ${menuItems.map((e) => e['title']).toList()}");
+      print(
+          "Fetched menu items for $restaurantName: ${menuItems.map((e) => e['title']).toList()}");
 
       // Ensure all items have titles
       menuItems = menuItems.where((item) => item['title'] != null).toList();
@@ -169,18 +171,19 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
       List<dynamic> safeMenuItems = allergenList.isEmpty
           ? menuItems
           : menuItems.where((item) {
-        String menuDetails = item['title'].toString().toLowerCase();
-        bool containsAllergen = allergenList.any((allergen) =>
-            menuDetails.contains(allergen.toLowerCase()));
+              String menuDetails = item['title'].toString().toLowerCase();
+              bool containsAllergen = allergenList.any(
+                  (allergen) => menuDetails.contains(allergen.toLowerCase()));
 
-        // Debug: Print whether each item is safe
-        print("${item['title']} - Contains allergen? $containsAllergen");
+              // Debug: Print whether each item is safe
+              print("${item['title']} - Contains allergen? $containsAllergen");
 
-        return !containsAllergen;
-      }).toList();
+              return !containsAllergen;
+            }).toList();
 
       // Debug: Print filtered safe menu items
-      print("Safe menu items: ${safeMenuItems.map((e) => e['title']).toList()}");
+      print(
+          "Safe menu items: ${safeMenuItems.map((e) => e['title']).toList()}");
 
       return safeMenuItems;
     } else {
@@ -189,209 +192,245 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     }
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF1D1E33), // Consistent dark theme
       appBar: AppBar(
         title: const Text('Restaurants',
-            style: TextStyle(color: Colors.white, fontFamily: "Poppins", fontWeight: FontWeight.w700,)),
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.w700,
+            )),
         backgroundColor: Color(0xFF282A45), // Dark modern app bar
         elevation: 4,
-        iconTheme: IconThemeData(color: Colors.white), // Makes the back arrow white
+        iconTheme:
+            IconThemeData(color: Colors.white), // Makes the back arrow white
       ),
       body: latitude == null || longitude == null
           ? const Center(child: CircularProgressIndicator())
           : Stack(
-        children: [
-
-          GoogleMap(
-            onMapCreated: (controller) {
-              mapController = controller;
-            },
-            initialCameraPosition: CameraPosition(
-              target: LatLng(latitude!, longitude!),
-              zoom: 12,
-            ),
-            markers: markers.map((marker) {
-              return marker.copyWith(
-                onTapParam: () {
-                  setState(() {
-                    selectedRestaurant = restaurants.firstWhere(
-                            (restaurant) =>
-                        restaurant['name'] == marker.markerId.value);
-                  });
-                },
-              );
-            }).toSet(),
-          ),
-          if (selectedRestaurant != null)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Card(
-                elevation: 8,
-                color: Color(0xFF282A45),
-                margin: const EdgeInsets.all(5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+              children: [
+                GoogleMap(
+                  onMapCreated: (controller) {
+                    mapController = controller;
+                  },
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(latitude!, longitude!),
+                    zoom: 12,
+                  ),
+                  markers: markers.map((marker) {
+                    return marker.copyWith(
+                      onTapParam: () {
+                        setState(() {
+                          selectedRestaurant = restaurants.firstWhere(
+                              (restaurant) =>
+                                  restaurant['name'] == marker.markerId.value);
+                        });
+                      },
+                    );
+                  }).toSet(),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      FutureBuilder<String?>(
-                        future:
-                        getRestaurantImageUrl(selectedRestaurant!['name']),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return const Icon(Icons.error, color: Colors.red);
-                          } else if (snapshot.hasData && snapshot.data != null) {
-                            return Container(
-                              height: 200,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                image: DecorationImage(
-                                  image: NetworkImage(snapshot.data!),
-                                  fit: BoxFit.cover,
+                if (selectedRestaurant != null)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Card(
+                      elevation: 8,
+                      color: Color(0xFF282A45),
+                      margin: const EdgeInsets.all(5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            FutureBuilder<String?>(
+                              future: getRestaurantImageUrl(
+                                  selectedRestaurant!['name']),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return const Icon(Icons.error,
+                                      color: Colors.red);
+                                } else if (snapshot.hasData &&
+                                    snapshot.data != null) {
+                                  return Container(
+                                    height: 200,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      image: DecorationImage(
+                                        image: NetworkImage(snapshot.data!),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return const SizedBox(height: 150);
+                                }
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              selectedRestaurant!['name'],
+                              style: const TextStyle(
+                                fontSize: 30,
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.tealAccent,
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                  horizontal: 24,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                            );
-                          } else {
-                            return const SizedBox(height: 150);
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        selectedRestaurant!['name'],
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontFamily: "Poppins",
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.tealAccent,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 14,
-                            horizontal: 24,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () async {
-                          if (selectedRestaurant!['hasSafeOptions']) {
-                            List<dynamic> menuItems = await fetchMenuItems(selectedRestaurant!['name']);
-                            List<String> safeMenuItems = menuItems
-                                .where((item) {
-                              String menuDetails = (item['title'] ?? '').toString().toLowerCase();
-                              return !allergenList.any((allergen) => menuDetails.contains(allergen.toLowerCase()));
-                            })
-                                .map<String>((item) => (item['title'] ?? '').toString())
-                                .toList();
+                              onPressed: () async {
+                                if (selectedRestaurant!['hasSafeOptions']) {
+                                  List<dynamic> menuItems =
+                                      await fetchMenuItems(
+                                          selectedRestaurant!['name']);
+                                  List<String> safeMenuItems = menuItems
+                                      .where((item) {
+                                        String menuDetails =
+                                            (item['title'] ?? '')
+                                                .toString()
+                                                .toLowerCase();
+                                        return !allergenList.any((allergen) =>
+                                            menuDetails.contains(
+                                                allergen.toLowerCase()));
+                                      })
+                                      .map<String>((item) =>
+                                          (item['title'] ?? '').toString())
+                                      .toList();
 
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  backgroundColor: Color(0xFF1D1E33),
-                                  title: Text(
-                                    selectedRestaurant!['name'],
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  content: SingleChildScrollView(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        if (safeMenuItems.isNotEmpty)
-                                          Column(
-                                            children: safeMenuItems.map((menuItem) => Card(
-                                              color: Color(0xFF282A45),
-                                              elevation: 2,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: ListTile(
-                                                leading: Icon(Icons.check_circle, color: Colors.green),
-                                                title: Text(
-                                                  menuItem,
-                                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        backgroundColor: Color(0xFF1D1E33),
+                                        title: Text(
+                                          selectedRestaurant!['name'],
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        content: SingleChildScrollView(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              if (safeMenuItems.isNotEmpty)
+                                                Column(
+                                                  children: safeMenuItems
+                                                      .map((menuItem) => Card(
+                                                            color: Color(
+                                                                0xFF282A45),
+                                                            elevation: 2,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            ),
+                                                            child: ListTile(
+                                                              leading: Icon(
+                                                                  Icons
+                                                                      .check_circle,
+                                                                  color: Colors
+                                                                      .green),
+                                                              title: Text(
+                                                                menuItem,
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                            ),
+                                                          ))
+                                                      .toList(),
+                                                )
+                                              else
+                                                Text(
+                                                  'No allergen-free items found.',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.red),
                                                 ),
-                                              ),
-                                            )).toList(),
-                                          )
-                                        else
-                                          Text(
-                                            'No allergen-free items found.',
-                                            style: TextStyle(fontSize: 16, color: Colors.red),
+                                            ],
                                           ),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('Close', style: TextStyle(color: Colors.tealAccent)),
-                                    ),
-                                  ],
-                                );
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: Text('Close',
+                                                style: TextStyle(
+                                                    color: Colors.tealAccent)),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                } else {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        backgroundColor: Color(0xFF1D1E33),
+                                        title: Text(
+                                          selectedRestaurant!['name'],
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        content: Text(
+                                          'This restaurant may not have allergen-free options.',
+                                          style: TextStyle(
+                                              fontSize: 16, color: Colors.red),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: Text('Close',
+                                                style: TextStyle(
+                                                    color: Colors.tealAccent)),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
                               },
-                            );
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  backgroundColor: Color(0xFF1D1E33),
-                                  title: Text(
-                                    selectedRestaurant!['name'],
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  content: Text(
-                                    'This restaurant may not have allergen-free options.',
-                                    style: TextStyle(fontSize: 16, color: Colors.red),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('Close', style: TextStyle(color: Colors.tealAccent)),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          }
-                        },
-
-
-
-
-                        child: const Text('More Details', style: TextStyle(fontFamily: 'Nunito'),),
+                              child: const Text(
+                                'More Details',
+                                style: TextStyle(fontFamily: 'Nunito'),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+              ],
             ),
-        ],
-      ),
     );
-
   }
 }

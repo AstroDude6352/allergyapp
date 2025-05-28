@@ -1,14 +1,14 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "allergyappd807d704_identitypool_d807d704",
-    "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "allergd807d704",
-    "userPoolName": "allergyappd807d704_userpool_d807d704",
+    "identityPoolName": "allergyappc27c5ceb_identitypool_c27c5ceb",
+    "allowUnauthenticatedIdentities": true,
+    "resourceNameTruncated": "allergc27c5ceb",
+    "userPoolName": "allergyappc27c5ceb_userpool_c27c5ceb",
     "autoVerifiedAttributes": [
       "email"
     ],
-    "mfaConfiguration": "OFF",
+    "mfaConfiguration": "OPTIONAL",
     "mfaTypes": [
       "SMS Text Message"
     ],
@@ -31,15 +31,42 @@
     "userpoolClientReadAttributes": [
       "email"
     ],
-    "userpoolClientLambdaRole": "allergd807d704_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "allergc27c5ceb_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "d807d704",
-    "resourceName": "allergyappd807d704",
+    "sharedId": "c27c5ceb",
+    "resourceName": "allergyappc27c5ceb",
     "authSelections": "identityPoolAndUserPool",
-    "useDefault": "default",
+    "useDefault": "manual",
+    "usernameAttributes": [
+      "email"
+    ],
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
-    "useEnabledMfas": true
+    "useEnabledMfas": true,
+    "authRoleArn": {
+      "Fn::GetAtt": [
+        "AuthRole",
+        "Arn"
+      ]
+    },
+    "unauthRoleArn": {
+      "Fn::GetAtt": [
+        "UnauthRole",
+        "Arn"
+      ]
+    },
+    "breakCircularDependency": true,
+    "dependsOn": [],
+    "thirdPartyAuth": false,
+    "userPoolGroups": false,
+    "adminQueries": false,
+    "triggers": {},
+    "hostedUI": false,
+    "authProviders": [],
+    "parentStack": {
+      "Ref": "AWS::StackId"
+    },
+    "permissions": []
   }
 }
