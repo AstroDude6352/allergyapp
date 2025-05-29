@@ -1,14 +1,11 @@
-import 'package:allergy_app/amplifyconfiguration.dart';
-import 'package:allergy_app/recipe_screen.dart';
-import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:amplify_storage_s3/amplify_storage_s3.dart';
+import 'package:allergy_app/home_screen.dart';
+import 'package:allergy_app/login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
-import 'package:amplify_api/amplify_api.dart'; // Only if using REST or GraphQL
-import 'package:amplify_storage_s3/amplify_storage_s3.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'data_provider.dart';
 import 'quiz_screen.dart';
 
@@ -16,42 +13,40 @@ const globalApiKey = 'AIzaSyCzPlrOqftEAJSIkNFjzyKUr3pGKWPKl5o';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
-  await configureAmplify();
+  final prefs = await SharedPreferences.getInstance();
+  final user = FirebaseAuth.instance.currentUser;
+  final quizCompleted = prefs.getBool('quizCompleted') ?? false;
+
+  Widget initialScreen;
+
+  if (user != null && quizCompleted) {
+    initialScreen = HomeScreen();
+  } else {
+    initialScreen = LoginScreen();
+  }
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => DataProvider()),
       ],
-      child: const MyApp(),
+      child: MyApp(initialScreen: initialScreen),
     ),
   );
 }
 
-Future<void> configureAmplify() async {
-  try {
-    if (!Amplify.isConfigured) {
-      await Amplify.addPlugins([
-        AmplifyAuthCognito(),
-        AmplifyAPI(), // only include if you added REST or GraphQL API
-        AmplifyStorageS3(),
-      ]);
-      await Amplify.configure(amplifyconfig);
-    }
-  } catch (e) {
-    print('Error configuring Amplify: $e');
-  }
-}
-
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget initialScreen;
+
+  const MyApp({super.key, required this.initialScreen});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: QuizScreen(),
+      home: initialScreen,
     );
   }
 }

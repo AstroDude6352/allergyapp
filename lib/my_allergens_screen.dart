@@ -15,20 +15,22 @@ class MyAllergensScreen extends StatelessWidget {
     'Sesame': Icons.bakery_dining,
   };
 
+  MyAllergensScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Allergens'),
+        title: const Text('My Allergens'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
                 CircleAvatar(
                   radius: 40,
@@ -48,12 +50,12 @@ class MyAllergensScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Allergens:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             dataProvider.allergens.isNotEmpty
                 ? Column(
                     children: dataProvider.allergens.keys.map((allergen) {
@@ -69,14 +71,14 @@ class MyAllergensScreen extends StatelessWidget {
                           ),
                           title: Text(
                             allergen,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
                       );
                     }).toList(),
                   )
-                : Text(
+                : const Text(
                     'No allergens selected',
                     style: TextStyle(fontSize: 16),
                   ),

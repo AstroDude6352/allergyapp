@@ -1,6 +1,9 @@
 import 'dart:io';
-import 'package:allergy_app/RecipeFromImageScreen.dart';
-import 'package:allergy_app/restaurant_screen.dart';
+import 'package:allergy_app/allergy_insights.dart';
+import 'package:allergy_app/login_screen.dart';
+import 'package:allergy_app/reaction_log.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +21,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   File? _imageFile;
   String userName = "Aditya Y";
   String userEmail = "example.com";
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<DataProvider>(context, listen: false).loadUserPreferences();
+  }
 
   Future<void> _selectImage() async {
     final pickedFile =
@@ -46,9 +55,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final dataProvider = Provider.of<DataProvider>(context);
 
     return Scaffold(
-      backgroundColor: Color(0xFF1D1E33), // Consistent dark theme
+      backgroundColor: const Color(0xFF1D1E33), // Consistent dark theme
       appBar: AppBar(
-        backgroundColor: Color(0xFF282A45),
+        backgroundColor: const Color(0xFF282A45),
         title: const Center(
           child: Text(
             'Profile',
@@ -102,13 +111,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Selected Diet:',
+                      const Text('Selected Taste Preference:',
                           style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               fontFamily: 'Poppins')),
                       const SizedBox(height: 4),
+                      Text(
+                        dataProvider.selectedTaste ?? 'No preference selected',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.tealAccent,
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -122,11 +140,166 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fontFamily: 'Poppins')),
               const SizedBox(height: 8),
               dataProvider.allergens.isNotEmpty
-                  ? Column(
-                      children: dataProvider.allergens.keys.map((allergen) {
+                  ? ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.tealAccent,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: () {
+                        showAllergensQuickView(
+                            context, dataProvider.allergens, allergenIcons);
+                      },
+                      child: const Text(
+                        'View Allergens',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      ),
+                    )
+                  : const Text('No allergens selected',
+                      style: TextStyle(fontSize: 16, color: Colors.white)),
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: () => signOut(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text(
+                  'Logout',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Poppins',
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF2E2F45),
+        selectedItemColor: Colors.greenAccent,
+        unselectedItemColor: Colors.white70,
+        currentIndex: 3, // Profile is index 3
+        onTap: (index) {
+          if (index == 3) return; // Already on Profile
+
+          Widget destination;
+          switch (index) {
+            case 0:
+              destination = const HomeScreen();
+              break;
+            case 1:
+              destination = const ReactionLogScreen();
+              break;
+            case 2:
+              destination = AllergyInsightsScreen();
+              break;
+            case 3:
+              destination = const ProfileScreen();
+              break;
+            default:
+              destination = const HomeScreen();
+          }
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => destination),
+          );
+        },
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt), label: 'Reactions'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.insights), label: 'Insights'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
+    );
+  }
+}
+
+void showAllergensQuickView(BuildContext context, Map<String, String> allergens,
+    Map<String, IconData> allergenIcons) {
+  final allergenList = allergens.keys.toList();
+
+  Color severityColor(String severity) {
+    switch (severity.toLowerCase()) {
+      case 'high':
+        return Colors.redAccent;
+      case 'medium':
+        return Colors.orangeAccent;
+      case 'low':
+        return Colors.greenAccent;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: const Color(0xFF1D1E33),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: allergenList.isEmpty
+            ? const Center(
+                child: Text(
+                  'No allergens selected',
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 5,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[600],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Your Allergens',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.tealAccent[400],
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: allergenList.length,
+                      itemBuilder: (context, index) {
+                        final allergen = allergenList[index];
+                        final severity = allergens[allergen] ?? 'Unknown';
                         return Card(
                           elevation: 2,
-                          color: Color(0xFF282A45),
+                          color: const Color(0xFF282A45),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -138,51 +311,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             title: Text(
                               allergen,
                               style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontFamily: 'Nunito'),
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontFamily: 'Nunito',
+                              ),
+                            ),
+                            trailing: Text(
+                              severity,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: severityColor(severity),
+                              ),
                             ),
                           ),
                         );
-                      }).toList(),
-                    )
-                  : const Text('No allergens selected',
-                      style: TextStyle(fontSize: 16)),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Color(0xFF282A45), // Dark footer for consistency
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              _buildNavBarItem(Icons.home, 'Home', Colors.blueGrey, context,
-                  const HomeScreen()),
-              _buildNavBarItem(Icons.local_dining, 'Scan', Colors.blueGrey,
-                  context, const RecipeFromImageScreen()),
-              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey,
-                  context, RestaurantScreen()),
-              _buildNavBarItem(Icons.person, 'Profile', Colors.tealAccent,
-                  context, const ProfileScreen()),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(
+                          color: Colors.tealAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+      );
+    },
+  );
+}
 
-  Widget _buildNavBarItem(IconData icon, String label, Color color,
-      BuildContext context, Widget screen) {
-    return IconButton(
-      onPressed: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => screen));
-      },
-      icon: Icon(icon, size: 28),
-      color: color,
-    );
+Future<void> signOut(BuildContext context) async {
+  try {
+    // Sign out from Firebase
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (_) => LoginScreen()));
+  } catch (e) {
+    print('Error signing out: $e');
   }
 }

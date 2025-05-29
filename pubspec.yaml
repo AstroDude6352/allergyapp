@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+    
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -54,12 +55,16 @@ dependencies:
   flutter_google_maps_webservices: ^1.1.1
   ai_barcode_scanner: ^6.0.1
   openfoodfacts: ^3.18.1
-  firebase_core: ^3.11.0
+  firebase_core: ^3.13.1
   firebase_ml_model_downloader: ^0.3.3
   amplify_flutter: ^2.6.1
   amplify_storage_s3: ^2.6.1
   amplify_auth_cognito: ^2.6.1
   amplify_api: ^2.6.1
+  firebase_auth: ^5.5.4
+  google_sign_in: ^6.3.0
+  shared_preferences: ^2.5.3
+  cloud_firestore: ^5.6.8
 
 dev_dependencies:
   flutter_test:
@@ -86,6 +91,8 @@ flutter:
       fonts:
         - asset: fonts/Poppins/Poppins-Bold.ttf
         - asset: fonts/Poppins/Poppins-Regular.ttf
+  assets: 
+    - assets/google_logo.png
 
 
 

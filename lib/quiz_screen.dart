@@ -1,7 +1,8 @@
+import 'package:allergy_app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:allergy_app/data_provider.dart';
-import 'home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const List<String> tastePreferences = [
   'Spicy',
@@ -61,6 +62,8 @@ const List<String> allergenList = [
 const List<String> severityLevels = ['Mild', 'Moderate', 'Severe'];
 
 class QuizScreen extends StatefulWidget {
+  const QuizScreen({super.key});
+
   @override
   _QuizScreenState createState() => _QuizScreenState();
 }
@@ -96,7 +99,7 @@ class _QuizScreenState extends State<QuizScreen> {
                             (currentQuestionIndex + 1) /
                             2),
                         decoration: BoxDecoration(
-                          color: Colors.pink,
+                          color: Colors.greenAccent,
                           borderRadius: BorderRadius.circular(10),
                         ),
                       );
@@ -195,7 +198,7 @@ class _QuizScreenState extends State<QuizScreen> {
                               DropdownButton<String>(
                                 dropdownColor: const Color(0xFF2E2F45),
                                 value: allergenSeverities[allergen],
-                                hint: Text(
+                                hint: const Text(
                                   'Severity',
                                   style: TextStyle(color: Colors.white70),
                                 ),
@@ -250,6 +253,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         });
                       }
                     } else {
+                      markQuizAsCompleted();
                       Provider.of<DataProvider>(context, listen: false)
                           .updateUserPreferences(
                         selectedTaste,
@@ -257,7 +261,8 @@ class _QuizScreenState extends State<QuizScreen> {
                       );
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreen()),
                       );
                     }
                   },
@@ -281,4 +286,9 @@ class _QuizScreenState extends State<QuizScreen> {
       ),
     );
   }
+}
+
+Future<void> markQuizAsCompleted() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('quizCompleted', true);
 }

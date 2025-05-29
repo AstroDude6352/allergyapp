@@ -1,27 +1,65 @@
-import 'package:allergy_app/RecipeFromImageScreen.dart';
-import 'package:allergy_app/CrossContamScreen.dart';
-import 'package:allergy_app/ProductScannerScreen.dart';
-import 'package:allergy_app/find_restaurant_info.dart';
-import 'package:allergy_app/restaurant_screen.dart';
+import 'package:allergy_app/allergy_insights.dart';
+import 'package:allergy_app/data_provider.dart';
+import 'package:allergy_app/reaction_log.dart';
 import 'package:flutter/material.dart';
-import '../recipe_screen.dart';
+import 'package:provider/provider.dart';
 import '../profile_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    String firstName = "Aditya"; // Placeholder name
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  final int _currentIndex = 0; // Home is index 0
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      Provider.of<DataProvider>(context, listen: false).loadUserPreferences();
+    });
+  }
+
+  void _onNavBarTap(int index) {
+    if (index == _currentIndex) return;
+
+    Widget destination;
+    switch (index) {
+      case 0:
+        destination = const HomeScreen();
+        break;
+      case 1:
+        destination = const ReactionLogScreen();
+        break;
+      case 2:
+        destination = AllergyInsightsScreen();
+        break;
+      case 3:
+        destination = const ProfileScreen();
+        break;
+      default:
+        destination = const HomeScreen();
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => destination),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1D1E33), // Consistent dark theme
+      backgroundColor: const Color(0xFF1D1E33), // Consistent dark theme
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Color(0xFF282A45), // Dark modern app bar
+        backgroundColor: const Color(0xFF282A45), // Dark modern app bar
         elevation: 4,
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -33,21 +71,12 @@ class HomeScreen extends StatelessWidget {
                   TextSpan(
                     children: [
                       const TextSpan(
-                        text: 'Welcome,\n',
+                        text: 'Welcome!',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
                           fontFamily: 'Poppins',
                           color: Colors.tealAccent, // Accent color
-                        ),
-                      ),
-                      TextSpan(
-                        text: firstName,
-                        style: const TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Poppins',
-                          color: Colors.white, // High contrast
                         ),
                       ),
                     ],
@@ -71,85 +100,74 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Text(
-                'Explore New Recipes',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.tealAccent, // Standout button color
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 24,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RecipeScreen(
-                        diet: 'Any',
-                        allergens: [],
-                      ),
-                    ),
-                  );
-                },
-                child: const Text(
-                  'Find Recipes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 40),
-              AllergyNewsSection(),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Color(0xFF282A45), // Dark footer for consistency
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              _buildNavBarItem(Icons.home, 'Home', Colors.tealAccent, context,
-                  const HomeScreen()),
-              _buildNavBarItem(Icons.local_dining, 'Scan', Colors.blueGrey,
-                  context, ProductScannerScreen()),
-              _buildNavBarItem(Icons.food_bank, 'Restaurants', Colors.blueGrey,
-                  context, RestaurantScreen()),
-              _buildNavBarItem(Icons.person, 'Profile', Colors.blueGrey,
-                  context, const ProfileScreen()),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildNavBarItem(IconData icon, String label, Color color,
-      BuildContext context, Widget screen) {
-    return IconButton(
-      onPressed: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => screen));
-      },
-      icon: Icon(icon, size: 28),
-      color: color,
+              // Motivational Quote Section
+              Card(
+                color: Colors.tealAccent.withOpacity(0.1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  child: const Text(
+                    'Stay safe! Your allergies are manageable with the right info.',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.tealAccent,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Nunito',
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // You can add your recipe list or placeholder here...
+
+              // Allergy News & Alerts Section
+              const AllergyNewsSection(),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF2E2F45),
+        selectedItemColor: Colors.greenAccent,
+        unselectedItemColor: Colors.white70,
+        currentIndex: _currentIndex,
+        onTap: _onNavBarTap,
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list_alt),
+            label: 'Reactions',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.insights),
+            label: 'Insights',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
     );
   }
 }
 
+// AllergyNewsSection remains unchanged
 class AllergyNewsSection extends StatefulWidget {
+  const AllergyNewsSection({super.key});
+
   @override
   _AllergyNewsSectionState createState() => _AllergyNewsSectionState();
 }
@@ -166,8 +184,10 @@ class _AllergyNewsSectionState extends State<AllergyNewsSection> {
   }
 
   Future<void> fetchNews() async {
+    final query = Uri.encodeComponent(
+        'allergy OR "food allergy" OR "allergic reaction" OR "allergy alert"');
     final String url =
-        "https://newsapi.org/v2/everything?q=food+allergy&language=en&sortBy=publishedAt&apiKey=$apiKey";
+        "https://newsapi.org/v2/everything?q=$query&language=en&sortBy=publishedAt&apiKey=$apiKey";
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -200,11 +220,12 @@ class _AllergyNewsSectionState extends State<AllergyNewsSection> {
       children: [
         const SizedBox(height: 20),
         const Text(
-          'Allergy News & Alerts',
+          'Allergy News',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontFamily: 'Poppins',
           ),
         ),
         const SizedBox(height: 10),
