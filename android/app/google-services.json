@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "837694659667",
+    "project_id": "allergy-app-11597",
+    "storage_bucket": "allergy-app-11597.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837694659667:android:cdf4ae1525e2293e3e7aa6",
+        "android_client_info": {
+          "package_name": "com.aditya.allergyapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQPIBl8fjoTrsUuAtdP_3Vij5gk1RPpFA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
