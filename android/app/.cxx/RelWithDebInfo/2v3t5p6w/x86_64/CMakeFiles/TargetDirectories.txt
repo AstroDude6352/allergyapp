@@ -1,0 +1,2 @@
+/Users/Aditya/APP/allergyapp-1/android/app/.cxx/RelWithDebInfo/2v3t5p6w/x86_64/CMakeFiles/edit_cache.dir
+/Users/Aditya/APP/allergyapp-1/android/app/.cxx/RelWithDebInfo/2v3t5p6w/x86_64/CMakeFiles/rebuild_cache.dir

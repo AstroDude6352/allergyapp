@@ -1,4 +1,4 @@
-package com.example.allergy_app
+package com.aditya.allergyapp
 
 import io.flutter.embedding.android.FlutterActivity
 

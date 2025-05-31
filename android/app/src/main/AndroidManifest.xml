@@ -1,12 +1,16 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.aditya.allergyapp">
 
 
 
 
-    <application
+
+<application
         android:label="allergy_app"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true">
+
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCou8uyOqcPwID8nBHNq9Rdvs8_JUpX_q0"/>
         <activity

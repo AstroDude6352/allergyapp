@@ -7,7 +7,7 @@ import 'reaction_log.dart';
 import 'profile_screen.dart';
 
 class AllergyInsightsScreen extends StatelessWidget {
-  AllergyInsightsScreen({super.key});
+  const AllergyInsightsScreen({super.key});
 
   final Map<String, String> allergenTips = const {
     'Milk': 'Try plant-based alternatives like oat or almond milk.',
@@ -63,7 +63,7 @@ class AllergyInsightsScreen extends StatelessWidget {
         destination = const ReactionLogScreen();
         break;
       case 2:
-        destination = AllergyInsightsScreen();
+        destination = const AllergyInsightsScreen();
         break;
       case 3:
         destination = const ProfileScreen();
@@ -152,9 +152,9 @@ class AllergyInsightsScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Text(
+                        const Text(
                           'Safe Alternatives:',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.blueAccent,

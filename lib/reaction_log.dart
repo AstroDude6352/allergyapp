@@ -33,7 +33,7 @@ class _ReactionLogScreenState extends State<ReactionLogScreen> {
 
   List<Map<String, dynamic>> _loggedReactions = [];
 
-  int _currentIndex = 1; // Reaction Log is index 1 in navbar
+  final int _currentIndex = 1; // Reaction Log is index 1 in navbar
 
   @override
   void initState() {
@@ -99,7 +99,7 @@ class _ReactionLogScreenState extends State<ReactionLogScreen> {
         destination = const ReactionLogScreen();
         break;
       case 2:
-        destination = AllergyInsightsScreen();
+        destination = const AllergyInsightsScreen();
         break;
       case 3:
         destination = const ProfileScreen();
@@ -210,9 +210,9 @@ class _ReactionLogScreenState extends State<ReactionLogScreen> {
                   const SizedBox(height: 20),
 
                   // Symptoms checkbox list
-                  Text(
+                  const Text(
                     'Symptoms:',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                       color: Colors.blueAccent,
@@ -248,7 +248,7 @@ class _ReactionLogScreenState extends State<ReactionLogScreen> {
                         controlAffinity: ListTileControlAffinity.leading,
                       ),
                     );
-                  }).toList(),
+                  }),
                   const SizedBox(height: 20),
 
                   // Notes input
@@ -297,9 +297,9 @@ class _ReactionLogScreenState extends State<ReactionLogScreen> {
                   const Divider(color: Colors.greenAccent),
 
                   // Logged reactions list
-                  Text(
+                  const Text(
                     'Logged Reactions:',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.greenAccent,
@@ -350,7 +350,7 @@ class _ReactionLogScreenState extends State<ReactionLogScreen> {
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),

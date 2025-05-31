@@ -1,3 +1,21 @@
+buildscript {
+    ext.kotlin_version = '1.9.0' // or '2.1.21' if your dependencies need it
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // Firebase / Google Services plugin
+        classpath 'com.google.gms:google-services:4.4.2'
+    }
+}
+
+plugins {
+    // This block is still okay, especially for Gradle 7+
+    id 'com.google.gms.google-services' version '4.4.2' apply false
+}
+
 allprojects {
     repositories {
         google()

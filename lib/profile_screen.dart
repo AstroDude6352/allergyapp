@@ -19,8 +19,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   File? _imageFile;
-  String userName = "Aditya Y";
-  String userEmail = "example.com";
 
   @override
   void initState() {
@@ -89,17 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(userName,
-                          style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              fontFamily: 'Poppins')),
-                      Text(userEmail,
-                          style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontFamily: 'Nunito')),
+
                     ],
                   ),
                 ],
@@ -202,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               destination = const ReactionLogScreen();
               break;
             case 2:
-              destination = AllergyInsightsScreen();
+              destination = const AllergyInsightsScreen();
               break;
             case 3:
               destination = const ProfileScreen();
@@ -356,7 +344,7 @@ Future<void> signOut(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
 
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (_) => LoginScreen()));
+        context, MaterialPageRoute(builder: (_) => const LoginScreen()));
   } catch (e) {
     print('Error signing out: $e');
   }

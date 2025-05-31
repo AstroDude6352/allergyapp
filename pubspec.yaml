@@ -56,7 +56,6 @@ dependencies:
   ai_barcode_scanner: ^6.0.1
   openfoodfacts: ^3.18.1
   firebase_core: ^3.13.1
-  firebase_ml_model_downloader: ^0.3.3
   amplify_flutter: ^2.6.1
   amplify_storage_s3: ^2.6.1
   amplify_auth_cognito: ^2.6.1
@@ -92,7 +91,7 @@ flutter:
         - asset: fonts/Poppins/Poppins-Bold.ttf
         - asset: fonts/Poppins/Poppins-Regular.ttf
   assets: 
-    - assets/google_logo.png
+    
 
 
 
@@ -116,7 +115,7 @@ flutter:
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
-  # example:
+  # aditya:
   # fonts:
   #   - family: Schyler
   #     fonts:

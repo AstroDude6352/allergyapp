@@ -259,11 +259,14 @@ class _QuizScreenState extends State<QuizScreen> {
                         selectedTaste,
                         allergenSeverities,
                       );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()),
-                      );
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginScreen()),
+                        );
+                      });
+
                     }
                   },
                   style: ElevatedButton.styleFrom(
