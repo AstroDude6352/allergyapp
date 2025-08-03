@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _processPendingNavigation() {
-    if (_pendingIndex != null && _pendingIndex != _currentIndex) {
+    if (_pendingIndex != null) {
       final indexToNavigate = _pendingIndex!;
       _pendingIndex = null;
 
@@ -77,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _pendingIndex = index; // mark navigation for later
       _currentIndex = index;
+      didChangeDependencies();
     });
   }
 
@@ -136,6 +137,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                   child: Text(
                     'Stay safe! Your allergies are manageable with the right info.',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.tealAccent,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Nunito',
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              Card(
+                color: Colors.tealAccent.withOpacity(0.1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  child: Text(
+                    'This app is an MVP. New features are currently in development.',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.tealAccent,

@@ -6,7 +6,7 @@
 
 
 <application
-        android:label="allergy_app"
+        android:label="AllerGuard"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">

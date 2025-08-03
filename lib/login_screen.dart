@@ -138,15 +138,31 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'FOODGUARD',
-              style: TextStyle(
-                color: Color(0xFF00E676),
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Poppins',
-                letterSpacing: 2.0,
-              ),
+            const Image(image: AssetImage('assets/logo.png'),),
+            const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'ALLER',
+                    style: TextStyle(
+                      color: Color(0xFF000000),
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                      letterSpacing: 2.0,
+                    ),
+                  ),
+                  const Text(
+                    'GUARD',
+                    style: TextStyle(
+                      color: Color(0xFF00E676),
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                      letterSpacing: 2.0,
+                    ),
+                  ),
+                ]
             ),
             const SizedBox(height: 50),
             TextField(
