@@ -1,5 +1,6 @@
 import 'package:allergy_app/allergy_insights.dart';
 import 'package:allergy_app/data_provider.dart';
+import 'package:allergy_app/mealplanner.dart';
 import 'package:allergy_app/reaction_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -15,6 +16,7 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   int? _pendingIndex;
@@ -22,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
     Future.microtask(() {
       Provider.of<DataProvider>(context, listen: false).loadUserPreferences();
     });
@@ -53,7 +56,11 @@ class _HomeScreenState extends State<HomeScreen> {
           destination = const ReactionLogScreen();
           break;
         case 2:
-          destination = const AllergyInsightsScreen();
+          final allergens = Provider.of<DataProvider>(context, listen: false)
+              .allergens
+              .keys
+              .toList();
+          destination = MealPlannerScreen(allergens: allergens);
           break;
         case 3:
           destination = const ProfileScreen();
@@ -181,8 +188,10 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Reactions'),
-          BottomNavigationBarItem(icon: Icon(Icons.insights), label: 'Insights'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt), label: 'Reactions'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.insights), label: 'Insights'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
