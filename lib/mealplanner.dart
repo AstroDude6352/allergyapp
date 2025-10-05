@@ -12,8 +12,7 @@ import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 class MealPlannerScreen extends StatefulWidget {
   final List<String> allergens;
 
-  const MealPlannerScreen({Key? key, required this.allergens})
-      : super(key: key);
+  const MealPlannerScreen({super.key, required this.allergens});
 
   @override
   State<MealPlannerScreen> createState() => _MealPlannerScreenState();
@@ -31,12 +30,12 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
   List<Recipe> _generatedRecipes = [];
   Map<String, dynamic>? _nutritionAnalysis;
   List<String> _detectedIngredients = [];
-  Map<String, IngredientDetail> _ingredientDetails =
+  final Map<String, IngredientDetail> _ingredientDetails =
       {}; // New: Store ingredient specifics
   String _selectedCuisine = 'Any';
   String _mealType = 'Any';
   int _servings = 2;
-  String _skillLevel = 'intermediate';
+  final String _skillLevel = 'intermediate';
   List<String> _dietaryPreferences =
       []; // New: vegan, vegetarian, dairy-free, etc.
 
@@ -879,11 +878,11 @@ class IngredientDetailDialog extends StatefulWidget {
   final Function(IngredientDetail) onSave;
 
   const IngredientDetailDialog({
-    Key? key,
+    super.key,
     required this.ingredient,
     required this.detail,
     required this.onSave,
-  }) : super(key: key);
+  });
 
   @override
   State<IngredientDetailDialog> createState() => _IngredientDetailDialogState();
@@ -1094,7 +1093,7 @@ class Ingredient {
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;
 
-  const RecipeCard({Key? key, required this.recipe}) : super(key: key);
+  const RecipeCard({super.key, required this.recipe});
 
   @override
   Widget build(BuildContext context) {

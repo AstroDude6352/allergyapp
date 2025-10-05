@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:allergy_app/allergy_insights.dart';
 import 'package:allergy_app/login_screen.dart';
 import 'package:allergy_app/reaction_log.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -74,21 +73,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Row(
+              const Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(width: 20),
-                  const Icon(
+                  SizedBox(width: 20),
+                  Icon(
                     Icons.medical_services,
                     size: 60,
                     color: Colors.tealAccent, // Allergy-related icon
                   ),
-                  const SizedBox(width: 20),
+                  SizedBox(width: 20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                    ],
+                    children: [],
                   ),
                 ],
               ),

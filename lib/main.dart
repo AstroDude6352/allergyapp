@@ -28,15 +28,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-
-      home: const RootScreen(),
+    return const MaterialApp(
+      home: RootScreen(),
     );
   }
 }
 
 class RootScreen extends StatefulWidget {
-  const RootScreen({Key? key}) : super(key: key);
+  const RootScreen({super.key});
 
   @override
   State<RootScreen> createState() => _RootScreenState();
