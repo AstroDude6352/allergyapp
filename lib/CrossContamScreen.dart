@@ -12,8 +12,8 @@ class CrossContamRiskScreen extends StatefulWidget {
 
 class _CrossContamRiskScreenState extends State<CrossContamRiskScreen> {
   List<Map<String, dynamic>> restaurants = [];
-  final String googleApiKey = "YOUR_GOOGLE_API_KEY";
-  final String spoonacularApiKey = "YOUR_SPOONACULAR_API_KEY";
+  final String googleApiKey = "AIzaSyBKapRibYm4aGKiQcpoN2qXDgoHRr7ruzg";
+  final String spoonacularApiKey = "db9ded054e0d4745a6636108c3987351";
   double? latitude;
   double? longitude;
 
@@ -24,7 +24,15 @@ class _CrossContamRiskScreenState extends State<CrossContamRiskScreen> {
   }
 
   Future<void> _getUserLocation() async {
-    if (!await Geolocator.isLocationServiceEnabled()) return;
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      print("Location service disabled");
+      setState(() {
+        latitude = 0;
+        longitude = 0;
+      });
+      return;
+    }
+
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -55,13 +63,24 @@ class _CrossContamRiskScreenState extends State<CrossContamRiskScreen> {
       "&key=$googleApiKey",
     );
 
+
     final response = await http.get(googlePlacesUrl);
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       List<Map<String, dynamic>> fetchedRestaurants = [];
+      setState(() {
+        restaurants = fetchedRestaurants;
+      });
+
+
+      for (final restaurant in restaurants) {
+        await _fetchMenuItemsAndAssessRisk(restaurant);
+      }
 
       for (int i = 0; i < data['results'].length && i < 5; i++) {
         final r = data['results'][i];
+        print('Google Places Response: ${response.body}');
+
         fetchedRestaurants.add({
           "name": r['name'],
           "placeId": r['place_id'],
@@ -70,13 +89,7 @@ class _CrossContamRiskScreenState extends State<CrossContamRiskScreen> {
         });
       }
 
-      setState(() {
-        restaurants = fetchedRestaurants;
-      });
 
-      for (final restaurant in restaurants) {
-        await _fetchMenuItemsAndAssessRisk(restaurant);
-      }
     }
   }
 
@@ -92,6 +105,7 @@ class _CrossContamRiskScreenState extends State<CrossContamRiskScreen> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final menuItems = data['menuItems'] ?? [];
+
       restaurant['menuItems'] = menuItems;
       restaurant['risk'] = _assessCrossContamRisk(menuItems);
       setState(() {});
@@ -99,11 +113,9 @@ class _CrossContamRiskScreenState extends State<CrossContamRiskScreen> {
   }
 
   String _assessCrossContamRisk(List<dynamic> menuItems) {
-    final userAllergens = Provider.of<DataProvider>(context)
-        .allergens
-        .keys
-        .map((key) => key.toLowerCase())
-        .toList();
+    final userAllergens = Provider.of<DataProvider>(context, listen: false)
+        .allergens.keys.map((key) => key.toLowerCase()).toList();
+
 
     int riskyCount = 0;
     for (final item in menuItems) {
